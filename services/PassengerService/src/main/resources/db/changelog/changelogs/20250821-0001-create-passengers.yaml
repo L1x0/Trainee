@@ -1,0 +1,63 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20250821
+      author: artem_astahov
+      preConditions:
+        - onFail: HALT
+        - dbms:
+            type: postgresql
+      changes:
+        - createTable:
+            tableName: passengers
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: phone_number
+                  type: varchar(30)
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: true
+              - column:
+                  name: version
+                  type: bigint
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - sql:
+            splitStatements: false
+            stripComments: true
+            sql: |
+              CREATE UNIQUE INDEX uq_passengers_email_not_deleted
+              ON passengers (email)
+              WHERE (deleted = false);
+      rollback:
+        - sql:
+            splitStatements: false
+            stripComments: true
+            sql: DROP INDEX IF EXISTS uq_passengers_email_not_deleted;
+        - dropTable:
+            tableName: passengers
