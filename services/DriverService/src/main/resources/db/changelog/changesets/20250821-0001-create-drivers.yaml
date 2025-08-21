@@ -1,0 +1,68 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-driver
+      author: artemastahov
+      changes:
+        - createTable:
+            tableName: drivers
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_driver
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(255)
+              - column:
+                  name: phone
+                  type: varchar(32)
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: true
+              - column:
+                  name: version
+                  type: bigint
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+
+        - addNotNullConstraint:
+            tableName: drivers
+            columnName: email
+            columnDataType: varchar(255)
+
+        - addUniqueConstraint:
+            tableName: drivers
+            columnNames: email
+            constraintName: uq_driver_email
+
+        - addUniqueConstraint:
+            tableName: drivers
+            columnNames: phone
+            constraintName: uq_driver_phone
+
+      rollback:
+        - dropTable:
+            tableName: drivers
+            cascadeConstraints: true

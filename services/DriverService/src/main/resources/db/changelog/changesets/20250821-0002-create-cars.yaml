@@ -1,0 +1,86 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-create-car
+      author: yourname
+      changes:
+        - createTable:
+            tableName: cars
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_car
+                    nullable: false
+              - column:
+                  name: driver_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: make
+                  type: varchar(100)
+              - column:
+                  name: color
+                  type: varchar(50)
+              - column:
+                  name: plate_number
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: true
+              - column:
+                  name: version
+                  type: bigint
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+
+        - addUniqueConstraint:
+            tableName: cars
+            columnNames: driver_id
+            constraintName: uq_car_driver_id
+
+        - addUniqueConstraint:
+            tableName: cars
+            columnNames: plate_number
+            constraintName: uq_car_plate_number
+
+        - sql:
+            splitStatements: false
+            stripComments: false
+            sql: |
+              ALTER TABLE cars
+              ADD CONSTRAINT chk_car_plate_belarus_format
+              CHECK (
+                plate_number ~ '^(?:[0-9]{4} ?[AEIOBCHKPTX]{2}-[0-9]|E[0-9]{3} ?[AEIOBCHKPTX]{2}-[0-9]|[AEIOBCHKPTX]{2} ?[0-9]{4}-[0-9]|[AEIOBCHKPTX][0-9]{4}[AEIOBCHKPTX]-[0-9])$'
+              );
+
+        - addForeignKeyConstraint:
+            baseTableName: cars
+            baseColumnNames: driver_id
+            referencedTableName: drivers
+            referencedColumnNames: id
+            constraintName: fk_car_driver
+            onDelete: CASCADE
+
+      rollback:
+        - dropTable:
+            tableName: cars
+            cascadeConstraints: true
