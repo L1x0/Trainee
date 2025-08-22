@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: 001-create-driver
+      id: 001-create-drivers
       author: artemastahov
       changes:
         - createTable:

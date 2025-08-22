@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
-      id: 002-create-car
-      author: yourname
+      id: 002-create-cars
+      author: artemastahov
       changes:
         - createTable:
             tableName: cars

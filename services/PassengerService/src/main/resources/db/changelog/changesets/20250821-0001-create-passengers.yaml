@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
-      id: 20250821
-      author: artem_astahov
+      id: 001-create-passengers
+      author: artemastahov
       preConditions:
         - onFail: HALT
         - dbms:

@@ -1,0 +1,121 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-trips
+      author: artemastahov
+      preConditions:
+        - not:
+            - tableExists:
+                tableName: trips
+
+      changes:
+        - createTable:
+            tableName: trips
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_trips
+                    nullable: false
+
+              - column:
+                  name: passenger_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: driver_id
+                  type: BIGINT
+                  constraints:
+                    nullable: true
+
+              - column:
+                  name: passenger_name
+                  type: varchar(255)
+              - column:
+                  name: driver_name
+                  type: varchar(255)
+
+              - column:
+                  name: origin_address
+                  type: varchar(500)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: destination_address
+                  type: varchar(500)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: status
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: order_datetime
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: price
+                  type: numeric(10,2)
+
+              - column:
+                  name: is_deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_at
+                  type: timestamp with time zone
+                  defaultValueComputed: CURRENT_TIMESTAMP
+
+        - createIndex:
+            tableName: trips
+            indexName: idx_trips_passenger_id
+            columns:
+              - column:
+                  name: passenger_id
+
+        - createIndex:
+            tableName: trips
+            indexName: idx_trips_driver_id
+            columns:
+              - column:
+                  name: driver_id
+
+        - createIndex:
+            tableName: trips
+            indexName: idx_trips_status_order_datetime
+            columns:
+              - column:
+                  name: status
+              - column:
+                  name: order_datetime
+
+        - sql:
+            splitStatements: false
+            stripsComments: false
+            sql: |
+              ALTER TABLE trips
+              ADD CONSTRAINT chk_trips_status_values
+              CHECK ( status IN (
+                'CREATED',
+                'ACCEPTED',
+                'EN_ROUTE_TO_PICKUP',
+                'EN_ROUTE_TO_DESTINATION',
+                'COMPLETED',
+                'CANCELLED'
+              ) );
+
+      rollback:
+        - dropTable:
+            tableName: trips
+            cascadeConstraints: true
