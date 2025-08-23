@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-insert-initial-trips
+      author: artemastahov
+      changes:
+        - insert:
+            tableName: trip_rating
+            columns:
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: trip_id, valueNumeric: 1 }
+              - column: { name: rater_id, valueNumeric: 1 }
+              - column: { name: rater_role, value: "PASSENGER" }
+              - column: { name: score, valueNumeric: 4}
+              - column: { name: comment, value: "Комфортная поездка" }
+        - insert:
+            tableName: trip_rating
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: trip_id, valueNumeric: 1 }
+              - column: { name: rater_id, valueNumeric: 1 }
+              - column: { name: rater_role, value: "DRIVER" }
+              - column: { name: score, valueNumeric: 5 }
+              - column: { name: comment, value: null }

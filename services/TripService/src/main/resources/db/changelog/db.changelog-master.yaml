@@ -3,3 +3,5 @@ databaseChangeLog:
       file: db/changelog/changesets/001-create-trips.yaml
   - include:
       file: db/changelog/changesets/002-create-outbox.yaml
+  - include:
+      file: db/changelog/changesets/003-insert-initial-trips.yaml

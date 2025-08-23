@@ -1,0 +1,52 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-insert-initial-passengers
+      author: artemastahov
+      contexts: dev,test
+
+      # Убедимся, что таблица существует — иначе лучше провалиться/пометить как выполненный.
+      preConditions:
+        - tableExists:
+            tableName: passengers
+
+      changes:
+        - insert:
+            tableName: passengers
+            columns:
+              - column: { name: name, value: "Иван Иванов" }
+              - column: { name: email, value: "ivan.ivanov@example.com" }
+              - column: { name: phone_number, value: "+375291234567" }
+
+        - insert:
+            tableName: passengers
+            columns:
+              - column: { name: name, value: "Анна Смирнова" }
+              - column: { name: email, value: "anna.smirnova@example.com" }
+              - column: { name: phone_number, value: "+375296543210" }
+
+        - insert:
+            tableName: passengers
+            columns:
+              - column: { name: name, value: "Пётр Ковалёв" }
+              - column: { name: email, value: "petr.kovalev@example.com" }
+              - column: { name: phone_number, value: "+375292222333" }
+
+        - insert:
+            tableName: passengers
+            columns:
+              - column: { name: name, value: "Ольга Миронова" }
+              - column: { name: email, value: "olga.mironova@example.com" }
+              - column: { name: phone_number, value: "+375333445566" }
+
+        - insert:
+            tableName: passengers
+            columns:
+              - column: { name: name, value: "Сергей Петров" }
+              - column: { name: email, value: "sergey.petrov@example.com" }
+              - column: { name: phone_number, value: "+375291112233" }
+
+      rollback:
+        # Удалим именно те записи, что мы добавили (по email)
+        - delete:
+            tableName: passengers
+            where: "email IN ('ivan.ivanov@example.com','anna.smirnova@example.com','petr.kovalev@example.com','olga.mironova@example.com','sergey.petrov@example.com')"

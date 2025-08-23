@@ -1,0 +1,71 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004-insert-initial-cars
+      author: artemastahov
+      contexts: dev,test
+      preConditions:
+        - tableExists:
+            tableName: cars
+        - sqlCheck:
+            expectedResult: "0"
+            sql: SELECT COUNT(*) FROM cars WHERE plate_number IN ('1234 AB-5','E123 AB-5','AB 1234-5','A1234B-5','5678 KT-6')
+
+      changes:
+        - insert:
+            tableName: cars
+            columns:
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: driver_id, valueNumeric: 1 }
+              - column: { name: make, value: "Toyota Prius" }
+              - column: { name: color, value: "White" }
+              - column: { name: plate_number, value: "1234 AB-5" }
+
+        - insert:
+            tableName: cars
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: driver_id, valueNumeric: 2 }
+              - column: { name: make, value: "Hyundai Sonata" }
+              - column: { name: color, value: "Silver" }
+              - column: { name: plate_number, value: "E123 AB-5" }
+
+        - insert:
+            tableName: cars
+            columns:
+              - column: { name: id, valueNumeric: 3 }
+              - column: { name: driver_id, valueNumeric: 3 }
+              - column: { name: make, value: "Skoda Octavia" }
+              - column: { name: color, value: "Black" }
+              - column: { name: plate_number, value: "AB 1234-5" }
+
+        - insert:
+            tableName: cars
+            columns:
+              - column: { name: id, valueNumeric: 4 }
+              - column: { name: driver_id, valueNumeric: 4 }
+              - column: { name: make, value: "Volkswagen Polo" }
+              - column: { name: color, value: "Blue" }
+              - column: { name: plate_number, value: "A1234B-5" }
+
+        - insert:
+            tableName: cars
+            columns:
+              - column: { name: id, valueNumeric: 5 }
+              - column: { name: driver_id, valueNumeric: 5 }
+              - column: { name: make, value: "Renault Logan" }
+              - column: { name: color, value: "Gray" }
+              - column: { name: plate_number, value: "5678 KT-6" }
+
+        # Обновим sequence для cars
+        - sql:
+            splitStatements: false
+            stripComments: false
+            sql: |
+              SELECT setval(pg_get_serial_sequence('cars','id'),
+                COALESCE((SELECT MAX(id) FROM cars), 1)
+              );
+
+      rollback:
+        - delete:
+            tableName: cars
+            where: "plate_number IN ('1234 AB-5','E123 AB-5','AB 1234-5','A1234B-5','5678 KT-6')"

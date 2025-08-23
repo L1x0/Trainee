@@ -1,0 +1,93 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-trip-rating
+      author: artemastahov
+      preConditions:
+        - not:
+            - tableExists:
+                tableName: trip_rating
+
+      changes:
+        - createTable:
+            tableName: trip_rating
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_trip_rating
+                    nullable: false
+
+              - column:
+                  name: trip_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: rater_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: rater_role
+                  type: varchar(16)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: score
+                  type: smallint
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: comment
+                  type: text
+
+              - column:
+                  name: created_at
+                  type: timestamp with time zone
+                  defaultValueComputed: CURRENT_TIMESTAMP
+
+        - addUniqueConstraint:
+            tableName: trip_rating
+            columnNames: trip_id, rater_role
+            constraintName: uq_trip_rating_tripid_role
+
+        - createIndex:
+            tableName: trip_rating
+            indexName: idx_trip_rating_trip_id
+            columns:
+              - column:
+                  name: trip_id
+        - createIndex:
+            tableName: trip_rating
+            indexName: idx_trip_rating_rater_id
+            columns:
+              - column:
+                  name: rater_id
+
+        - sql:
+            splitStatements: false
+            stripComments: false
+            sql: |
+              ALTER TABLE trip_rating
+              ADD CONSTRAINT chk_trip_rating_score_range
+              CHECK (score >= 1 AND score <= 5);
+
+        - sql:
+            splitStatements: false
+            stripComments: false
+            sql: |
+              ALTER TABLE trip_rating
+              ADD CONSTRAINT chk_trip_rating_rater_role_enum
+              CHECK (rater_role IN ('DRIVER','PASSENGER'));
+
+      rollback:
+        - dropTable:
+            tableName: trip_rating
+            cascadeConstraints: true

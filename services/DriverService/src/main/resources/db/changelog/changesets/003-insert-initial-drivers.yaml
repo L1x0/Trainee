@@ -1,0 +1,66 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-insert-initial-drivers
+      author: artemastahov
+      contexts: dev,test
+      preConditions:
+        - tableExists:
+            tableName: drivers
+        - sqlCheck:
+            expectedResult: "0"
+            sql: SELECT COUNT(*) FROM drivers WHERE email IN ('ivan.driver@example.com','anna.driver@example.com','petr.driver@example.com','olga.driver@example.com','sergey.driver@example.com')
+
+      changes:
+        - insert:
+            tableName: drivers
+            columns:
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: name, value: "Иван Водитель" }
+              - column: { name: email, value: "ivan.driver@example.com" }
+              - column: { name: phone, value: "+375291000001" }
+
+        - insert:
+            tableName: drivers
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: name, value: "Анна Водитель" }
+              - column: { name: email, value: "anna.driver@example.com" }
+              - column: { name: phone, value: "+375291000002" }
+
+        - insert:
+            tableName: drivers
+            columns:
+              - column: { name: id, valueNumeric: 3 }
+              - column: { name: name, value: "Пётр Водитель" }
+              - column: { name: email, value: "petr.driver@example.com" }
+              - column: { name: phone, value: "+375291000003" }
+
+        - insert:
+            tableName: drivers
+            columns:
+              - column: { name: id, valueNumeric: 4 }
+              - column: { name: name, value: "Ольга Водитель" }
+              - column: { name: email, value: "olga.driver@example.com" }
+              - column: { name: phone, value: "+375291000004" }
+
+        - insert:
+            tableName: drivers
+            columns:
+              - column: { name: id, valueNumeric: 5 }
+              - column: { name: name, value: "Сергей Водитель" }
+              - column: { name: email, value: "sergey.driver@example.com" }
+              - column: { name: phone, value: "+375291000005" }
+
+        # Приводим sequence (Postgres) в соответствие с максимальным id
+        - sql:
+            splitStatements: false
+            stripComments: false
+            sql: |
+              SELECT setval(pg_get_serial_sequence('drivers','id'),
+                COALESCE((SELECT MAX(id) FROM drivers), 1)
+              );
+
+      rollback:
+        - delete:
+            tableName: drivers
+            where: "email IN ('ivan.driver@example.com','anna.driver@example.com','petr.driver@example.com','olga.driver@example.com','sergey.driver@example.com')"

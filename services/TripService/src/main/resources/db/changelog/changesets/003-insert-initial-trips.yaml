@@ -1,0 +1,106 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-insert-initial-trips
+      author: artemastahov
+      contexts: dev,test
+      preConditions:
+        - tableExists:
+            tableName: trips
+        - sqlCheck:
+            expectedResult: "0"
+            sql: SELECT COUNT(*) FROM trips WHERE id IN (1,2,3,4,5)
+
+      changes:
+        - insert:
+            tableName: trips
+            columns:
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: passenger_id, valueNumeric: 1 }
+              - column: { name: driver_id, valueNumeric: 1 }
+              - column: { name: passenger_name, value: "Иван Иванов" }
+              - column: { name: driver_name, value: "Иван Водитель" }
+              - column: { name: origin_address, value: "ул. Ленина, 1, Минск" }
+              - column: { name: destination_address, value: "пр. Победителей, 10, Минск" }
+              - column: { name: status, value: "COMPLETED" }
+              - column:
+                  name: order_datetime
+                  valueDate: TO_TIMESTAMP('2025-08-20 10:00:00+03', 'YYYY-MM-DD HH24:MI:SS+TZH')
+              - column: { name: price, valueNumeric: 12.50 }
+
+        - insert:
+            tableName: trips
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: passenger_id, valueNumeric: 2 }
+              - column: { name: driver_id, valueNumeric: 2 }
+              - column: { name: passenger_name, value: "Анна Смирнова" }
+              - column: { name: driver_name, value: "Анна Водитель" }
+              - column: { name: origin_address, value: "ул. Независимости, 100, Минск" }
+              - column: { name: destination_address, value: "ул. Сурганова, 5, Минск" }
+              - column: { name: status, value: "ACCEPTED" }
+              - column:
+                  name: order_datetime
+                  valueDate: TO_TIMESTAMP('2025-08-22 15:30:00+03:00', 'YYYY-MM-DD HH24:MI:SS+TZH')
+              - column: { name: price, valueNumeric: 8.75 }
+
+        - insert:
+            tableName: trips
+            columns:
+              - column: { name: id, valueNumeric: 3 }
+              - column: { name: passenger_id, valueNumeric: 3 }
+              - column: { name: driver_id, valueNumeric: 3 }
+              - column: { name: passenger_name, value: "Пётр Ковалёв" }
+              - column: { name: driver_name, value: "Пётр Водитель" }
+              - column: { name: origin_address, value: "ул. Куйбышева, 2, Минск" }
+              - column: { name: destination_address, value: "Ж/д вокзал, Минск" }
+              - column: { name: status, value: "EN_ROUTE_TO_PICKUP" }
+              - column:
+                  name: order_datetime
+                  valueDate: TO_TIMESTAMP('2025-08-23 09:00:00+03:00', 'YYYY-MM-DD HH24:MI:SS+TZH')
+              - column: { name: price, valueNumeric: 6.00 }
+
+        - insert:
+            tableName: trips
+            columns:
+              - column: { name: id, valueNumeric: 4 }
+              - column: { name: passenger_id, valueNumeric: 4 }
+              - column: { name: driver_id, valueNumeric: 4 }
+              - column: { name: passenger_name, value: "Ольга Миронова" }
+              - column: { name: driver_name, value: "Ольга Водитель" }
+              - column: { name: origin_address, value: "ул. Якуба Коласа, 12, Минск" }
+              - column: { name: destination_address, value: "ТРЦ Galleria, Минск" }
+              - column: { name: status, value: "CREATED" }
+              - column:
+                  name: order_datetime
+                  valueDate: TO_TIMESTAMP('2025-08-24 20:00:00+03:00', 'YYYY-MM-DD HH24:MI:SS+TZH')
+              - column: { name: price, valueNumeric: 15.00 }
+
+        - insert:
+            tableName: trips
+            columns:
+              - column: { name: id, valueNumeric: 5 }
+              - column: { name: passenger_id, valueNumeric: 5 }
+              - column: { name: driver_id, valueNumeric: 5 }
+              - column: { name: passenger_name, value: "Сергей Петров" }
+              - column: { name: driver_name, value: "Сергей Водитель" }
+              - column: { name: origin_address, value: "ул. Франтишка Богушевича, 7, Минск" }
+              - column: { name: destination_address, value: "ул. Гикало, 3, Минск" }
+              - column: { name: status, value: "CANCELLED" }
+              - column:
+                  name: order_datetime
+                  valueDate: TO_TIMESTAMP('2025-08-19 08:45:00+03:00', 'YYYY-MM-DD HH24:MI:SS+TZH')
+              - column: { name: price, valueNumeric: 0.00 }
+
+        # приведение sequence (Postgres) в соответствие
+        - sql:
+            splitStatements: false
+            stripComments: false
+            sql: |
+              SELECT setval(pg_get_serial_sequence('trips','id'),
+                COALESCE((SELECT MAX(id) FROM trips), 1)
+              );
+
+      rollback:
+        - delete:
+            tableName: trips
+            where: "id IN (1,2,3,4,5)"
