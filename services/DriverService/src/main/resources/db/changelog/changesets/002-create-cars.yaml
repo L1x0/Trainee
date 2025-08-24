@@ -35,7 +35,7 @@ databaseChangeLog:
                   type: timestamp
                   defaultValueComputed: CURRENT_TIMESTAMP
               - column:
-                  name: deleted
+                  name: is_deleted
                   type: boolean
                   defaultValueBoolean: false
                   constraints:

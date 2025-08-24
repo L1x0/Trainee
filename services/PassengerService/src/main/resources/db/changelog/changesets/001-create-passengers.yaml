@@ -31,7 +31,7 @@ databaseChangeLog:
                   name: phone_number
                   type: varchar(30)
               - column:
-                  name: deleted
+                  name: is_deleted
                   type: boolean
                   defaultValueBoolean: false
                   constraints:
@@ -47,17 +47,6 @@ databaseChangeLog:
                   defaultValueNumeric: 0
                   constraints:
                     nullable: false
-        - sql:
-            splitStatements: false
-            stripComments: true
-            sql: |
-              CREATE UNIQUE INDEX uq_passengers_email_not_deleted
-              ON passengers (email)
-              WHERE (deleted = false);
       rollback:
-        - sql:
-            splitStatements: false
-            stripComments: true
-            sql: DROP INDEX IF EXISTS uq_passengers_email_not_deleted;
         - dropTable:
             tableName: passengers
