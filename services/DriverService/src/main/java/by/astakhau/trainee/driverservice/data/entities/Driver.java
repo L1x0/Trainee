@@ -1,4 +1,4 @@
-package by.astakhau.trainee.passengerservice.data.entities;
+package by.astakhau.trainee.driverservice.data.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -7,25 +7,25 @@ import org.hibernate.annotations.SQLRestriction;
 
 import java.time.OffsetDateTime;
 
-
 @Data
 @Entity
-@Table(name = "passengers")
-@SQLDelete(sql = "UPDATE passengers SET is_deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@Table(name = "drivers")
+@SQLDelete(sql = "UPDATE drivers SET is_deleted = true WHERE id = ?")
 @SQLRestriction("is_deleted = false")
-public class Passenger {
+public class Driver {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
-    @Column(name = "name")
     private String name;
 
-    @Column(name = "email")
     private String email;
 
     @Column(name = "phone_number")
     private String phoneNumber;
+
+    @Column(name = "created_at")
+    private OffsetDateTime createdAt;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted;
@@ -35,4 +35,7 @@ public class Passenger {
 
     @Version
     private Integer version;
+
+    @OneToOne(mappedBy = "driver")
+    private Car car;
 }

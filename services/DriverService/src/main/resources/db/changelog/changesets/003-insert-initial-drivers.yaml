@@ -17,7 +17,7 @@ databaseChangeLog:
               - column: { name: id, valueNumeric: 1 }
               - column: { name: name, value: "Иван Водитель" }
               - column: { name: email, value: "ivan.driver@example.com" }
-              - column: { name: phone, value: "+375291000001" }
+              - column: { name: phone_number, value: "+375291000001" }
 
         - insert:
             tableName: drivers
@@ -25,7 +25,7 @@ databaseChangeLog:
               - column: { name: id, valueNumeric: 2 }
               - column: { name: name, value: "Анна Водитель" }
               - column: { name: email, value: "anna.driver@example.com" }
-              - column: { name: phone, value: "+375291000002" }
+              - column: { name: phone_number, value: "+375291000002" }
 
         - insert:
             tableName: drivers
@@ -33,7 +33,7 @@ databaseChangeLog:
               - column: { name: id, valueNumeric: 3 }
               - column: { name: name, value: "Пётр Водитель" }
               - column: { name: email, value: "petr.driver@example.com" }
-              - column: { name: phone, value: "+375291000003" }
+              - column: { name: phone_number, value: "+375291000003" }
 
         - insert:
             tableName: drivers
@@ -41,7 +41,7 @@ databaseChangeLog:
               - column: { name: id, valueNumeric: 4 }
               - column: { name: name, value: "Ольга Водитель" }
               - column: { name: email, value: "olga.driver@example.com" }
-              - column: { name: phone, value: "+375291000004" }
+              - column: { name: phone_number, value: "+375291000004" }
 
         - insert:
             tableName: drivers
@@ -49,7 +49,7 @@ databaseChangeLog:
               - column: { name: id, valueNumeric: 5 }
               - column: { name: name, value: "Сергей Водитель" }
               - column: { name: email, value: "sergey.driver@example.com" }
-              - column: { name: phone, value: "+375291000005" }
+              - column: { name: phone_number, value: "+375291000005" }
 
         # Приводим sequence (Postgres) в соответствие с максимальным id
         - sql:

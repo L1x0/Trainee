@@ -23,7 +23,7 @@ databaseChangeLog:
                   name: email
                   type: varchar(255)
               - column:
-                  name: phone
+                  name: phone_number
                   type: varchar(32)
               - column:
                   name: created_at
@@ -59,8 +59,8 @@ databaseChangeLog:
 
         - addUniqueConstraint:
             tableName: drivers
-            columnNames: phone
-            constraintName: uq_driver_phone
+            columnNames: phone_number
+            constraintName: uq_driver_phone_number
 
       rollback:
         - dropTable:

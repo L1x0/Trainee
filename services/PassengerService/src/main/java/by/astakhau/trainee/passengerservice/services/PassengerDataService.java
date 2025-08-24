@@ -1,4 +1,4 @@
-package by.astakhau.trainee.passengerservice.data.services;
+package by.astakhau.trainee.passengerservice.services;
 
 import by.astakhau.trainee.passengerservice.data.dtos.PassengerRequestDto;
 import by.astakhau.trainee.passengerservice.data.dtos.PassengerResponseDto;
