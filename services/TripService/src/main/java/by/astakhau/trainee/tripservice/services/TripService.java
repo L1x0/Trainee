@@ -18,10 +18,12 @@ public class TripService {
     private final TripRepository tripRepository;
     private final TripMapper tripMapper;
 
+    @Transactional(readOnly = true)
     public TripResponseDto findById(Long id) {
         return tripMapper.toTripResponseDto(tripRepository.findById(id).orElse(null));
     }
 
+    @Transactional(readOnly = true)
     public List<TripResponseDto> findAll() {
         var tempResult = tripRepository.findAll();
 

@@ -1,14 +1,14 @@
-CREATE USER svc_a WITH PASSWORD 'dev';
-CREATE USER svc_b WITH PASSWORD 'dev';
-CREATE USER svc_c WITH PASSWORD 'dev';
-CREATE USER svc_d WITH PASSWORD 'dev';
+CREATE USER passengers_user WITH PASSWORD 'dev';
+CREATE USER drivers_user WITH PASSWORD 'dev';
+CREATE USER trips_user WITH PASSWORD 'dev';
+CREATE USER trips_rating_user WITH PASSWORD 'dev';
 
-CREATE DATABASE svc_a_db OWNER svc_a;
-CREATE DATABASE svc_b_db OWNER svc_b;
-CREATE DATABASE svc_c_db OWNER svc_c;
-CREATE DATABASE svc_d_db OWNER svc_d;
+CREATE DATABASE passengers_db OWNER passengers_user;
+CREATE DATABASE drivers_db OWNER drivers_user;
+CREATE DATABASE trips_db OWNER trips_user;
+CREATE DATABASE trips_rating_db OWNER trips_rating_user;
 
-GRANT ALL PRIVILEGES ON DATABASE svc_a_db TO svc_a;
-GRANT ALL PRIVILEGES ON DATABASE svc_b_db TO svc_b;
-GRANT ALL PRIVILEGES ON DATABASE svc_c_db TO svc_c;
-GRANT ALL PRIVILEGES ON DATABASE svc_d_db TO svc_d;
+GRANT ALL PRIVILEGES ON DATABASE passengers_db TO passengers_user;
+GRANT ALL PRIVILEGES ON DATABASE drivers_db TO drivers_user;
+GRANT ALL PRIVILEGES ON DATABASE trips_db TO trips_user;
+GRANT ALL PRIVILEGES ON DATABASE trips_rating_db TO trips_rating_user;

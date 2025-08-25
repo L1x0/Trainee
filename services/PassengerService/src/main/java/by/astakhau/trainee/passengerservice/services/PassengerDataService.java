@@ -19,7 +19,7 @@ import java.util.List;
 public class PassengerDataService {
 
     final private PassengerRepository passengerRepository;
-    final PassengerMapper passengerMapper;
+    final private PassengerMapper passengerMapper;
 
     @Transactional
     public void savePassenger(PassengerRequestDto passengerRequestDto) {
@@ -31,10 +31,12 @@ public class PassengerDataService {
         passengerRepository.save(passenger);
     }
 
+    @Transactional(readOnly = true)
     public PassengerResponseDto findById(Long id) {
         return passengerMapper.fromPassenger(passengerRepository.findById(id).orElse(null));
     }
 
+    @Transactional(readOnly = true)
     public List<PassengerResponseDto> findAll() {
         var results = passengerRepository.findAll();
         List<PassengerResponseDto> passengerResponseDtos = new ArrayList<>();
@@ -46,6 +48,7 @@ public class PassengerDataService {
         return passengerResponseDtos;
     }
 
+    @Transactional(readOnly = true)
     public List<PassengerResponseDto> findAllByName(String name) {
         var results = passengerRepository.findByName(name);
         List<PassengerResponseDto> passengerResponseDtos = new ArrayList<>();
@@ -57,6 +60,7 @@ public class PassengerDataService {
         return passengerResponseDtos;
     }
 
+    @Transactional
     public List<PassengerResponseDto> findAllByIsDeleted(boolean isDeleted) {
         var results = passengerRepository.findByIsDeleted(isDeleted);
         List<PassengerResponseDto> passengerResponseDtos = new ArrayList<>();
@@ -68,6 +72,7 @@ public class PassengerDataService {
         return passengerResponseDtos;
     }
 
+    @Transactional
     public void deleteById(long id) {
         passengerRepository.deleteById(id);
     }
