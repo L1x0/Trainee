@@ -11,6 +11,6 @@ import org.mapstruct.factory.Mappers;
 public interface PassengerMapper {
     PassengerMapper INSTANCE = Mappers.getMapper(PassengerMapper.class);
 
-    PassengerResponseDto fromPassenger(Passenger passenger);
+    PassengerResponseDto passengerToPassengerResponseDto(Passenger passenger);
     Passenger fromRequestDto(PassengerRequestDto passengerRequestDto);
 }

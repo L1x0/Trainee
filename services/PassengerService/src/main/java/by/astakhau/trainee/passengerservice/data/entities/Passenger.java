@@ -11,7 +11,6 @@ import java.time.OffsetDateTime;
 @Data
 @Entity
 @Table(name = "passengers")
-@SQLDelete(sql = "UPDATE passengers SET is_deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @SQLRestriction("is_deleted = false")
 public class Passenger {
     @Id

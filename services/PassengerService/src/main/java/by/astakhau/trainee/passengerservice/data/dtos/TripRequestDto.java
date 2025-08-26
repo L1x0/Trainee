@@ -3,9 +3,9 @@ package by.astakhau.trainee.passengerservice.data.dtos;
 import lombok.Data;
 
 @Data
-public class PassengerResponseDto {
-    private Long id;
+public class TripRequestDto {
     private String name;
-    private String email;
     private String phoneNumber;
+    private String destinationAddress;
+    private String originAddress;
 }
