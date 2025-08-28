@@ -16,6 +16,9 @@ public interface PassengerRepository extends JpaRepository<Passenger, Long> {
     Page<Passenger> findByName(String name, Pageable pageable);
     Page<Passenger> findByIsDeleted(Boolean isDeleted,  Pageable pageable);
 
+    @Query(value = "SELECT * FROM passengers WHERE id = ?", nativeQuery = true)
+    Optional<Passenger> findById(Long id);
+
     @Modifying
     @Transactional
     @Query(value = "UPDATE passengers SET is_deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE name = :name AND email = :email", nativeQuery = true)

@@ -24,8 +24,8 @@ public class PassengerController {
         passengerService.savePassenger(passengerRequestDto);
     }
 
-    @GetMapping("/{id}")
-    public PassengerResponseDto findById(@PathVariable Long id) {
+    @GetMapping(params = "id")
+    public PassengerResponseDto findById(@RequestParam(required = false) Long id) {
         return passengerService.findById(id);
     }
 
