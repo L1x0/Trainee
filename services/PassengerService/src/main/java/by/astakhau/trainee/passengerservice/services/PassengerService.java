@@ -34,7 +34,7 @@ public class PassengerService {
         passengerRepository.save(passenger);
 
         log.info("Passenger saved with ID: {}, phone number: {}, email: {}",
-                passenger.getId(),  passenger.getPhoneNumber(), passenger.getEmail());
+                passenger.getId(), passenger.getPhoneNumber(), passenger.getEmail());
     }
 
     public PassengerResponseDto findById(Long id) {
@@ -47,12 +47,30 @@ public class PassengerService {
         return results.map(passengerMapper::passengerToPassengerResponseDto);
     }
 
-    public Page<PassengerResponseDto> findAllByName(String name,  Pageable pageable) {
+    public Page<PassengerResponseDto> findAllByName(String name, Pageable pageable) {
         var results = passengerRepository.findByName(name, pageable);
 
         log.info("Passengers found with name: {}, pageable: {}", name, pageable);
 
         return results.map(passengerMapper::passengerToPassengerResponseDto);
+    }
+
+    @Transactional
+    public void update(String name, String phoneNumber, PassengerRequestDto passengerRequestDto) {
+        var passenger = passengerRepository.findByNameAndPhoneNumber(name, phoneNumber);
+
+        if (passenger.isPresent()) {
+            log.info("Updating passenger");
+
+            passenger.get().setEmail(passengerRequestDto.getEmail());
+            passenger.get().setPhoneNumber(passengerRequestDto.getPhoneNumber());
+            passengerRepository.save(passenger.get());
+
+            log.info("Passenger updated");
+            return;
+        }
+
+        log.error("No passenger found with name: {}, phoneNumber: {}", name, phoneNumber);
     }
 
 
@@ -67,7 +85,7 @@ public class PassengerService {
     public void createTripOrder(TripRequestDto tripRequestDto) {
         var owner = getOrderOwner(tripRequestDto);
 
-        if(owner.isEmpty())
+        if (owner.isEmpty())
             throw new IllegalArgumentException("There isn't people with same info");
         else {
             //отправить данные на сервис поездок

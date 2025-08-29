@@ -47,8 +47,12 @@ public class PassengerController {
     }
 
     @PutMapping("/update")
-    public void updatePassenger(@Valid @RequestBody PassengerRequestDto passengerRequestDto) {
-        passengerService.savePassenger(passengerRequestDto);
+    public void updatePassenger(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String phoneNumber,
+            @Valid @RequestBody PassengerRequestDto passengerRequestDto) {
+
+        passengerService.update(name, phoneNumber, passengerRequestDto);
     }
 
     @DeleteMapping(value = "/delete", params = "email")
