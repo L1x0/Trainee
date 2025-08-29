@@ -4,23 +4,26 @@ import by.astakhau.trainee.passengerservice.dtos.PassengerRequestDto;
 import by.astakhau.trainee.passengerservice.dtos.PassengerResponseDto;
 import by.astakhau.trainee.passengerservice.dtos.TripRequestDto;
 import by.astakhau.trainee.passengerservice.services.PassengerService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/passenger")
 @RequiredArgsConstructor
 @EnableSpringDataWebSupport(pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
+@Validated
 public class PassengerController {
     private final PassengerService passengerService;
 
     @PostMapping("/create")
-    public void createPassenger(@RequestBody PassengerRequestDto passengerRequestDto) {
+    public void createPassenger(@Valid @RequestBody PassengerRequestDto passengerRequestDto) {
         passengerService.savePassenger(passengerRequestDto);
     }
 
@@ -44,7 +47,7 @@ public class PassengerController {
     }
 
     @PutMapping("/update")
-    public void updatePassenger(@RequestBody PassengerRequestDto passengerRequestDto) {
+    public void updatePassenger(@Valid @RequestBody PassengerRequestDto passengerRequestDto) {
         passengerService.savePassenger(passengerRequestDto);
     }
 
@@ -58,7 +61,7 @@ public class PassengerController {
 
 
     @PostMapping("/create-order")
-    public void createOrder(@RequestBody TripRequestDto tripRequestDto) {
+    public void createOrder(@Valid @RequestBody TripRequestDto tripRequestDto) {
         passengerService.createTripOrder(tripRequestDto);
     }
 }

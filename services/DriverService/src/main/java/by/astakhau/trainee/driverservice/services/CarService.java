@@ -5,6 +5,7 @@ import by.astakhau.trainee.driverservice.entities.Car;
 import by.astakhau.trainee.driverservice.mappers.CarMapper;
 import by.astakhau.trainee.driverservice.repositories.CarRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,9 +22,5 @@ public class CarService {
 
     public CarResponseDto findById(Long id) {
         return carMapper.carToCarResponseDto(carRepository.findById(id).orElse(null));
-    }
-
-    public Car save(Car car) {
-        return carRepository.save(car);
     }
 }

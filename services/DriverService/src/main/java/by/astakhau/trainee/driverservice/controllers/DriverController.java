@@ -4,21 +4,24 @@ import by.astakhau.trainee.driverservice.dtos.DriverRequestDto;
 import by.astakhau.trainee.driverservice.dtos.DriverResponseDto;
 import by.astakhau.trainee.driverservice.dtos.TripDto;
 import by.astakhau.trainee.driverservice.services.DriverService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/drivers")
 @EnableSpringDataWebSupport(pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
+@Validated
 public class DriverController {
     private final DriverService driverService;
 
     @PostMapping("/create")
-    public void createDriver(@RequestBody DriverRequestDto dto) {
+    public void createDriver(@Valid @RequestBody DriverRequestDto dto) {
         driverService.save(dto);
     }
 
@@ -33,7 +36,7 @@ public class DriverController {
     }
 
     @PutMapping("/update")
-    public void updateDriver(@RequestParam(required = false) String email, @RequestBody DriverRequestDto dto) {
+    public void updateDriver(@RequestParam(required = false) String email, @Valid @RequestBody DriverRequestDto dto) {
         driverService.update(dto);
     }
 

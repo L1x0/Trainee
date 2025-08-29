@@ -5,21 +5,24 @@ import by.astakhau.trainee.tripservice.dtos.TripRequestDto;
 import by.astakhau.trainee.tripservice.dtos.TripResponseDto;
 import by.astakhau.trainee.tripservice.entities.TripStatus;
 import by.astakhau.trainee.tripservice.services.TripService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/trips")
 @EnableSpringDataWebSupport(pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
+@Validated
 public class TripController {
     private final TripService tripService;
 
     @PostMapping("/update")
-    public void createTrip(@RequestBody TripRequestDto tripRequestDto) {
+    public void createTrip(@Valid @RequestBody TripRequestDto tripRequestDto) {
         tripService.save(tripRequestDto);
     }
 
@@ -42,7 +45,7 @@ public class TripController {
     public TripResponseDto updateTrip(
             @RequestParam(required = false) String passengerName,
             @RequestParam(required = false) String driverName
-            ,@RequestBody TripRequestDto tripRequestDto) {
+            ,@Valid @RequestBody TripRequestDto tripRequestDto) {
 
         return tripService.update(passengerName, driverName, tripRequestDto);
     }

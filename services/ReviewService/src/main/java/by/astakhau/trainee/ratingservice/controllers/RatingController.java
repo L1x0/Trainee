@@ -4,16 +4,19 @@ import by.astakhau.trainee.ratingservice.dtos.RatingRequestDto;
 import by.astakhau.trainee.ratingservice.dtos.RatingResponseDto;
 import by.astakhau.trainee.ratingservice.entities.RaterRole;
 import by.astakhau.trainee.ratingservice.services.RatingService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/rating")
 @RequiredArgsConstructor
 @EnableSpringDataWebSupport(pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
+@Validated
 public class RatingController {
     private final RatingService ratingService;
 
@@ -33,7 +36,7 @@ public class RatingController {
     }
 
     @PostMapping("/create")
-    public RatingResponseDto createRating(@RequestBody RatingRequestDto ratingRequestDto) {
+    public RatingResponseDto createRating(@Valid @RequestBody RatingRequestDto ratingRequestDto) {
         return ratingService.createRating(ratingRequestDto);
     }
 
@@ -41,7 +44,7 @@ public class RatingController {
     public RatingResponseDto updateRating(
             @RequestParam(required = false) Long raterId,
             @RequestParam(required = false) RaterRole raterRole,
-            @RequestBody RatingRequestDto ratingRequestDto) {
+            @Valid @RequestBody RatingRequestDto ratingRequestDto) {
         return ratingService.update(raterId, raterRole, ratingRequestDto);
     }
 

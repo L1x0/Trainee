@@ -6,6 +6,7 @@ import by.astakhau.trainee.ratingservice.entities.RaterRole;
 import by.astakhau.trainee.ratingservice.mappers.RatingMapper;
 import by.astakhau.trainee.ratingservice.repositories.RatingRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RatingService {
     private final RatingRepository ratingRepository;
     private final RatingMapper ratingMapper;
@@ -31,12 +33,17 @@ public class RatingService {
         var rating = ratingRepository.findByRaterRoleAndRaterId(raterRole, raterId);
 
         if (rating.isPresent()) {
+            log.info("Old rating is {}", rating.get());
+
             rating.get().setComment(ratingRequestDto.getComment());
             rating.get().setScore(ratingRequestDto.getScore());
 
-            ratingRepository.save(rating.get());
+            log.info("Updated rating is {}", rating.get());
+
+            return ratingMapper.ratingToRatingResponseDto(ratingRepository.save(rating.get()));
         }
 
+        log.error("No rating found for rater {} with role {}", raterId,  raterRole);
         return null;
     }
 
@@ -44,16 +51,17 @@ public class RatingService {
     public RatingResponseDto createRating(RatingRequestDto ratingRequestDto) {
         var rating = ratingMapper.ratingRequestDtoToRating(ratingRequestDto);
         ratingRepository.save(rating);
+
+        log.info("New rating is {}", rating);
+
         return ratingMapper.ratingToRatingResponseDto(rating);
     }
 
-    @Transactional
-    public RatingResponseDto updateRating(RatingRequestDto ratingRequestDto) {
-        return createRating(ratingRequestDto);
-    }
 
     @Transactional
     public void deleteRating(RaterRole raterRole, String raterComment) {
         ratingRepository.deleteByRaterRoleAndComment(raterRole, raterComment);
+
+        log.info("Deleted rating for rater {} with comment {}", raterRole, raterComment);
     }
 }

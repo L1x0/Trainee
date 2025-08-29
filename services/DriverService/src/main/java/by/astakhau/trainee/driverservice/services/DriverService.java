@@ -8,20 +8,20 @@ import by.astakhau.trainee.driverservice.mappers.CarMapper;
 import by.astakhau.trainee.driverservice.mappers.DriverMapper;
 import by.astakhau.trainee.driverservice.repositories.DriverRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DriverService {
     private final DriverRepository driverRepository;
     private final DriverMapper driverMapper;
-    private final CarService carService;
     private final CarMapper carMapper;
 
 
@@ -43,6 +43,8 @@ public class DriverService {
         car.setDriver(driver);
 
         driverRepository.save(driver);
+
+        log.info("Saved Driver: {}", driver);
     }
 
     public void update(DriverRequestDto driverRequestDto) {
@@ -55,7 +57,11 @@ public class DriverService {
 
 
             driverRepository.save(driver.get());
+
+            log.info("Updated Driver: {}", driver.get());
         }
+
+        log.error("Driver is failed: {}", driver);
     }
 
     public Page<DriverResponseDto> findAll(Pageable pageable) {
@@ -74,6 +80,8 @@ public class DriverService {
     @Transactional
     public void deleteByNameAndEmail(String name, String email) {
         driverRepository.softDeleteByNameAndEmail(name, email);
+
+        log.info("Driver with name {} and email {} deleted", name, email);
     }
 
     //функция подбора свободного водителя для создания нового заказа
