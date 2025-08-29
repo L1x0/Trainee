@@ -39,7 +39,7 @@ databaseChangeLog:
                   type: boolean
                   defaultValueBoolean: false
                   constraints:
-                    nullable: false
+                    nullable: true
               - column:
                   name: deleted_at
                   type: timestamp with time zone

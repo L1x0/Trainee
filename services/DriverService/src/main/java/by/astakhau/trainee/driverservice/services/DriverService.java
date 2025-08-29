@@ -1,23 +1,28 @@
 package by.astakhau.trainee.driverservice.services;
 
-import by.astakhau.trainee.driverservice.data.dtos.DriverRequestDto;
-import by.astakhau.trainee.driverservice.data.dtos.DriverResponseDto;
-import by.astakhau.trainee.driverservice.data.entities.Driver;
-import by.astakhau.trainee.driverservice.data.mappers.DriverMapper;
-import by.astakhau.trainee.driverservice.data.repositories.DriverRepository;
+import by.astakhau.trainee.driverservice.dtos.DriverRequestDto;
+import by.astakhau.trainee.driverservice.dtos.DriverResponseDto;
+import by.astakhau.trainee.driverservice.dtos.TripDto;
+import by.astakhau.trainee.driverservice.entities.Driver;
+import by.astakhau.trainee.driverservice.mappers.CarMapper;
+import by.astakhau.trainee.driverservice.mappers.DriverMapper;
+import by.astakhau.trainee.driverservice.repositories.DriverRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class DriverService {
     private final DriverRepository driverRepository;
     private final DriverMapper driverMapper;
+    private final CarService carService;
+    private final CarMapper carMapper;
 
 
     @Transactional
@@ -28,23 +33,38 @@ public class DriverService {
         driver.setIsDeleted(false);
         driver.setDeletedAt(null);
 
+        var car = carMapper.fromRequestDto(driverRequestDto.getCar());
+
+        car.setCreatedAt(OffsetDateTime.now());
+        car.setIsDeleted(false);
+        car.setDeletedAt(null);
+
+        driver.setCar(car);
+        car.setDriver(driver);
+
         driverRepository.save(driver);
     }
 
-    @Transactional(readOnly = true)
-    public List<DriverResponseDto> findAll() {
-        List<Driver> result = driverRepository.findAll();
+    public void update(DriverRequestDto driverRequestDto) {
+        var driver = driverRepository.findByEmail(driverRequestDto.getEmail());
 
-        List<DriverResponseDto> driverResponseDtos = new ArrayList<>();
+        if (driver.isPresent()) {
+            driver.get().setEmail(driverRequestDto.getEmail());
+            driver.get().setName(driverRequestDto.getName());
+            driver.get().setPhoneNumber(driverRequestDto.getPhoneNumber());
 
-        result.forEach(driver -> {
-            driverResponseDtos.add(driverMapper.driverToDriverResponseDto(driver));
-        });
 
-        return driverResponseDtos;
+            driverRepository.save(driver.get());
+        }
     }
 
-    @Transactional(readOnly = true)
+    public Page<DriverResponseDto> findAll(Pageable pageable) {
+        var result = driverRepository.findAll(pageable);
+
+        return driverRepository.findAll(pageable).map(driverMapper::driverToDriverResponseDto);
+    }
+
+
     public DriverResponseDto findById(Long id) {
         Driver driver = driverRepository.findById(id).orElse(null);
 
@@ -52,7 +72,12 @@ public class DriverService {
     }
 
     @Transactional
-    public void deleteById(Long id) {
-        driverRepository.deleteById(id);
+    public void deleteByNameAndEmail(String name, String email) {
+        driverRepository.softDeleteByNameAndEmail(name, email);
+    }
+
+    //функция подбора свободного водителя для создания нового заказа
+    public TripDto getDriverForTrip() {
+        return driverRepository.findFirstById(1).map(driverMapper::DriverToTripDto).orElse(null);
     }
 }

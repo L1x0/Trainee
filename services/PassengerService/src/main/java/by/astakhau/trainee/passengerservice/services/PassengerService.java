@@ -1,11 +1,11 @@
 package by.astakhau.trainee.passengerservice.services;
 
-import by.astakhau.trainee.passengerservice.data.dtos.PassengerRequestDto;
-import by.astakhau.trainee.passengerservice.data.dtos.PassengerResponseDto;
-import by.astakhau.trainee.passengerservice.data.dtos.TripRequestDto;
-import by.astakhau.trainee.passengerservice.data.entities.Passenger;
-import by.astakhau.trainee.passengerservice.data.mappers.PassengerMapper;
-import by.astakhau.trainee.passengerservice.data.repositories.PassengerRepository;
+import by.astakhau.trainee.passengerservice.dtos.PassengerRequestDto;
+import by.astakhau.trainee.passengerservice.dtos.PassengerResponseDto;
+import by.astakhau.trainee.passengerservice.dtos.TripRequestDto;
+import by.astakhau.trainee.passengerservice.entities.Passenger;
+import by.astakhau.trainee.passengerservice.mappers.PassengerMapper;
+import by.astakhau.trainee.passengerservice.repositories.PassengerRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,39 +32,32 @@ public class PassengerService {
         passengerRepository.save(passenger);
     }
 
-    @Transactional(readOnly = true)
     public PassengerResponseDto findById(Long id) {
         return passengerMapper.passengerToPassengerResponseDto(passengerRepository.findById(id).orElse(null));
     }
 
-    @Transactional(readOnly = true)
     public Page<PassengerResponseDto> findAll(Pageable pageable) {
         var results = passengerRepository.findAll(pageable);
 
         return results.map(passengerMapper::passengerToPassengerResponseDto);
     }
 
-    @Transactional(readOnly = true)
     public Page<PassengerResponseDto> findAllByName(String name,  Pageable pageable) {
         var results = passengerRepository.findByName(name, pageable);
 
         return results.map(passengerMapper::passengerToPassengerResponseDto);
     }
 
-    @Transactional(readOnly = true)
-    public Page<PassengerResponseDto> findAllByIsDeleted(boolean isDeleted,  Pageable pageable) {
-        var results = passengerRepository.findByIsDeleted(isDeleted,  pageable);
-
-        return results.map(passengerMapper::passengerToPassengerResponseDto);
-    }
 
     @Transactional
     public void deleteWithEmail(String name, String email) {
         passengerRepository.softDeleteByNameAndEmail(name, email);
     }
 
+    @Transactional
     public void createTripOrder(TripRequestDto tripRequestDto) {
         var owner = getOrderOwner(tripRequestDto);
+
         if(owner.isEmpty())
             throw new IllegalArgumentException("There isn't people with same info");
         else {

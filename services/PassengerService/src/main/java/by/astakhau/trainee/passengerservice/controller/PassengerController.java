@@ -1,8 +1,8 @@
 package by.astakhau.trainee.passengerservice.controller;
 
-import by.astakhau.trainee.passengerservice.data.dtos.PassengerRequestDto;
-import by.astakhau.trainee.passengerservice.data.dtos.PassengerResponseDto;
-import by.astakhau.trainee.passengerservice.data.dtos.TripRequestDto;
+import by.astakhau.trainee.passengerservice.dtos.PassengerRequestDto;
+import by.astakhau.trainee.passengerservice.dtos.PassengerResponseDto;
+import by.astakhau.trainee.passengerservice.dtos.TripRequestDto;
 import by.astakhau.trainee.passengerservice.services.PassengerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

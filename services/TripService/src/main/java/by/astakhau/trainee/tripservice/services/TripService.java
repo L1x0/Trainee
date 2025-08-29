@@ -1,16 +1,19 @@
 package by.astakhau.trainee.tripservice.services;
 
-import by.astakhau.trainee.tripservice.data.dtos.TripRequestDto;
-import by.astakhau.trainee.tripservice.data.dtos.TripResponseDto;
-import by.astakhau.trainee.tripservice.data.entities.TripStatus;
-import by.astakhau.trainee.tripservice.data.mappers.TripMapper;
-import by.astakhau.trainee.tripservice.data.repositories.TripRepository;
+import by.astakhau.trainee.tripservice.dtos.PassengerOrderDto;
+import by.astakhau.trainee.tripservice.dtos.TripRequestDto;
+import by.astakhau.trainee.tripservice.dtos.TripResponseDto;
+import by.astakhau.trainee.tripservice.entities.Trip;
+import by.astakhau.trainee.tripservice.entities.TripStatus;
+import by.astakhau.trainee.tripservice.mappers.TripMapper;
+import by.astakhau.trainee.tripservice.repositories.TripRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,43 +21,59 @@ public class TripService {
     private final TripRepository tripRepository;
     private final TripMapper tripMapper;
 
-    @Transactional(readOnly = true)
+    public TripResponseDto createTrip(PassengerOrderDto passengerOrderDto) {
+        /*
+        тут будет инициироваться подбор водителя
+         и объединение данных для формирования поездки
+        */
+
+        return null;
+    }
+
     public TripResponseDto findById(Long id) {
         return tripMapper.toTripResponseDto(tripRepository.findById(id).orElse(null));
     }
 
-    @Transactional(readOnly = true)
-    public List<TripResponseDto> findAll() {
-        var tempResult = tripRepository.findAll();
-
-        return tempResult.stream().map(tripMapper::toTripResponseDto).collect(Collectors.toList());
+    public Page<TripResponseDto> findAll(Pageable pageable) {
+        return tripRepository.findAll(pageable).map(tripMapper::toTripResponseDto);
     }
 
-    @Transactional
-    public void save(TripRequestDto trip) {
-        /* Думаю, тут стоит прикрутить данные с других сервисов */
+    public Page<TripResponseDto> findAllByStatus(Pageable pageable, TripStatus status) {
+        return tripRepository.findAllByStatus(pageable, status).map(tripMapper::toTripResponseDto);
     }
 
-    @Transactional
-    public void changeStatus(TripRequestDto tripRequestDto, TripStatus status) { // мб лучше сделать по схеме 1 функция = 1 статус
-        var trip = tripRepository.findTripByRequestInfo(
-                tripRequestDto.getOriginAddress(),
-                tripRequestDto.getDestinationAddress(),
-                tripRequestDto.getPassengerName());
+    public TripResponseDto update(String passengerName, String driverName, TripRequestDto tripRequestDto) {
+        Optional<Trip> trip = tripRepository.findByDriverNameAndPassengerName(driverName, passengerName);
+
 
         if (trip.isPresent()) {
-            trip.get().setStatus(status);
-            tripRepository.save(trip.get());
+            trip.get().setPassengerName(tripRequestDto.getPassengerName());
+            trip.get().setDestinationAddress(tripRequestDto.getDestinationAddress());
+            trip.get().setOriginAddress(tripRequestDto.getOriginAddress());
+
+            return tripMapper.toTripResponseDto(tripRepository.save(trip.get()));
+        }
+        else  {
+            return null;
         }
     }
 
     @Transactional
-    public void delete(TripRequestDto tripRequestDto) {
-        var trip = tripRepository.findTripByRequestInfo(
-                tripRequestDto.getOriginAddress(),
-                tripRequestDto.getDestinationAddress(),
-                tripRequestDto.getPassengerName());
+    public void delete(String driverName, String destinationAddress) {
+        tripRepository.softDelete(driverName, destinationAddress);
+    }
 
-        trip.ifPresent(tripRepository::delete);
+    @Transactional
+    public void save(TripRequestDto trip) {
+        tripRepository.save(tripMapper.TripRequestDtoToTrip(trip));
+    }
+
+    @Transactional
+    public void changeStatus(String passengerName, String driverName, TripStatus status) { // мб лучше сделать по функции на перевод в каждый статус
+        tripRepository.findByDriverNameAndPassengerName(driverName, passengerName)
+                .ifPresent(value -> {
+                    value.setStatus(status);
+                    tripRepository.save(value);
+                });
     }
 }
