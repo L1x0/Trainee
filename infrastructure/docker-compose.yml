@@ -1,23 +1,5 @@
 
 services:
-  zookeeper:
-    image: bitnami/zookeeper:3.8
-    environment:
-      ALLOW_ANONYMOUS_LOGIN: "yes"
-    ports:
-      - "2181:2181"
-
-  kafka:
-    image: bitnami/kafka:3.5
-    environment:
-      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
-      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      ALLOW_PLAINTEXT_LISTENER: "yes"
-    depends_on:
-      - zookeeper
-    ports:
-      - "9092:9092"
 
   postgres:
     image: postgres:15
@@ -27,40 +9,194 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./postgres-init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - backend
     ports:
       - "5432:5432"
 
-  redis:
-    image: redis:7
-    ports:
-      - "6379:6379"
 
-  mongo:
-    image: mongo:6
+  eureka:
+    build:
+      context: ../services/EurekaService
+      dockerfile: Dockerfile
+    image: eureka-server:local
+    container_name: eureka
     ports:
-      - "27017:27017"
-    volumes:
-      - mongodata:/data/db
+      - "8761:8761"
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
 
-  prometheus:
-    image: prom/prometheus:v2.45.0
-    volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-    ports:
-      - "9090:9090"
-
-  grafana:
-    image: grafana/grafana:latest
+  driver-service:
+    build:
+      context: ../services/DriverService
+      dockerfile: Dockerfile
+    image: driver-service:local
+    container_name: driver-service
+    depends_on:
+      - eureka
+      - postgres
     environment:
-      GF_SECURITY_ADMIN_PASSWORD: "grafana"
+      - SPRING_PROFILES_ACTIVE=local
+      - SPRING_APPLICATION_NAME=driver-service
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+      - EUREKA_INSTANCE_INSTANCEID=${HOSTNAME}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/drivers_db
+      - SPRING_DATASOURCE_USERNAME=drivers_user
+      - SPRING_DATASOURCE_PASSWORD=dev
+      - SERVER_PORT=8080
     ports:
-      - "3000:3000"
+      - "8081:8080"
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
 
-  loki:
-    image: grafana/loki:2.8.2
+  passenger-service:
+    build:
+      context: ../services/PassengerService
+      dockerfile: Dockerfile
+    image: passenger-service:local
+    container_name: passenger-service
+    depends_on:
+      - eureka
+      - postgres
+    environment:
+      - SPRING_PROFILES_ACTIVE=local
+      - SPRING_APPLICATION_NAME=passenger
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+      - EUREKA_INSTANCE_INSTANCEID=${HOSTNAME}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/passengers_db
+      - SPRING_DATASOURCE_USERNAME=passengers_user
+      - SPRING_DATASOURCE_PASSWORD=dev
+      - SERVER_PORT=8080
     ports:
-      - "3100:3100"
+      - "8082:8080"
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+  trip-service:
+    build:
+      context: ../services/TripService
+      dockerfile: Dockerfile
+    image: trip-service:local
+    container_name: trip-service
+    depends_on:
+      - eureka
+      - postgres
+    environment:
+      - SPRING_PROFILES_ACTIVE=local
+      - SPRING_APPLICATION_NAME=trip-service
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+      - EUREKA_INSTANCE_INSTANCEID=${HOSTNAME}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/trips_db
+      - SPRING_DATASOURCE_USERNAME=trips_user
+      - SPRING_DATASOURCE_PASSWORD=dev
+      - SERVER_PORT=8080
+    ports:
+      - "8083:8080"
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+  rating-service:
+    build:
+      context: ../services/RatingService
+      dockerfile: Dockerfile
+    image: rating-service:local
+    container_name: rating-service
+    depends_on:
+      - eureka
+      - postgres
+    environment:
+      - SPRING_PROFILES_ACTIVE=local
+      - SPRING_APPLICATION_NAME=rating-service
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+      - EUREKA_INSTANCE_INSTANCEID=${HOSTNAME}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/trips_rating_db
+      - SPRING_DATASOURCE_USERNAME=trips_rating_user
+      - SPRING_DATASOURCE_PASSWORD=dev
+      - SERVER_PORT=8080
+    ports:
+      - "8084:8080"
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+#  zookeeper:
+#    image: bitnami/zookeeper:3.8
+#    environment:
+#      ALLOW_ANONYMOUS_LOGIN: "yes"
+#    ports:
+#      - "2181:2181"
+#
+#  kafka:
+#    image: bitnami/kafka:3.5
+#    environment:
+#      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+#      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
+#      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+#      ALLOW_PLAINTEXT_LISTENER: "yes"
+#    depends_on:
+#      - zookeeper
+#    ports:
+#      - "9092:9092"
+
+#  redis:
+#    image: redis:7
+#    ports:
+#      - "6379:6379"
+#
+#  mongo:
+#    image: mongo:6
+#    ports:
+#      - "27017:27017"
+#    volumes:
+#      - mongodata:/data/db
+
+#  prometheus:
+#    image: prom/prometheus:v2.45.0
+#    volumes:
+#      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+#    ports:
+#      - "9090:9090"
+#
+#  grafana:
+#    image: grafana/grafana:latest
+#    environment:
+#      GF_SECURITY_ADMIN_PASSWORD: "grafana"
+#    ports:
+#      - "3000:3000"
+#
+#  loki:
+#    image: grafana/loki:2.8.2
+#    ports:
+#      - "3100:3100"
+
+networks:
+  backend:
+    driver: bridge
 
 volumes:
   pgdata:
-  mongodata:
+#  mongodata:

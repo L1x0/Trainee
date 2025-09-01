@@ -44,8 +44,8 @@ public class TripController {
     @PutMapping("/update")
     public TripResponseDto updateTrip(
             @RequestParam(required = false) String passengerName,
-            @RequestParam(required = false) String driverName
-            ,@Valid @RequestBody TripRequestDto tripRequestDto) {
+            @RequestParam(required = false) String driverName,
+            @Valid @RequestBody TripRequestDto tripRequestDto) {
 
         return tripService.update(passengerName, driverName, tripRequestDto);
     }
