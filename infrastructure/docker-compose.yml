@@ -44,7 +44,7 @@ services:
       - SPRING_PROFILES_ACTIVE=local
       - SPRING_APPLICATION_NAME=driver-service
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
-      - EUREKA_INSTANCE_INSTANCEID=${HOSTNAME}
+      - EUREKA_INSTANCE_INSTANCEID=driver-service
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/drivers_db
       - SPRING_DATASOURCE_USERNAME=drivers_user
       - SPRING_DATASOURCE_PASSWORD=dev
@@ -53,6 +53,33 @@ services:
       - "8081:8080"
     networks:
       - backend
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+  gateway-service:
+    build:
+      context: ../services/GatewayService
+      dockerfile: Dockerfile
+    image: gateway-service:local
+    container_name: gateway-service
+    depends_on:
+      - eureka
+      - postgres
+      - passenger-service
+      - driver-service
+      - trip-service
+      - rating-service
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+      - EUREKA_INSTANCE_INSTANCEID=gateway-service
+    ports:
+      - "8085:8080"
+    networks:
+      - backend
+
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health || exit 1" ]
       interval: 10s
@@ -70,9 +97,9 @@ services:
       - postgres
     environment:
       - SPRING_PROFILES_ACTIVE=local
-      - SPRING_APPLICATION_NAME=passenger
+      - SPRING_APPLICATION_NAME=passenger-service
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
-      - EUREKA_INSTANCE_INSTANCEID=${HOSTNAME}
+      - EUREKA_INSTANCE_INSTANCEID=passenger-service
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/passengers_db
       - SPRING_DATASOURCE_USERNAME=passengers_user
       - SPRING_DATASOURCE_PASSWORD=dev
@@ -100,7 +127,7 @@ services:
       - SPRING_PROFILES_ACTIVE=local
       - SPRING_APPLICATION_NAME=trip-service
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
-      - EUREKA_INSTANCE_INSTANCEID=${HOSTNAME}
+      - EUREKA_INSTANCE_INSTANCEID=trip-service
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/trips_db
       - SPRING_DATASOURCE_USERNAME=trips_user
       - SPRING_DATASOURCE_PASSWORD=dev
@@ -128,7 +155,7 @@ services:
       - SPRING_PROFILES_ACTIVE=local
       - SPRING_APPLICATION_NAME=rating-service
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
-      - EUREKA_INSTANCE_INSTANCEID=${HOSTNAME}
+      - EUREKA_INSTANCE_INSTANCEID=rating-service
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/trips_rating_db
       - SPRING_DATASOURCE_USERNAME=trips_rating_user
       - SPRING_DATASOURCE_PASSWORD=dev
