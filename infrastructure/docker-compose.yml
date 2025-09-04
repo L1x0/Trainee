@@ -73,6 +73,7 @@ services:
       - trip-service
       - rating-service
     environment:
+      - SPRING_APPLICATION_NAME=gateway-service
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
       - EUREKA_INSTANCE_INSTANCEID=gateway-service
     ports:
