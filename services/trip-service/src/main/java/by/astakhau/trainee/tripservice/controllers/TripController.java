@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class TripController {
     private final TripService tripService;
 
-    @PostMapping("/update")
+    @PostMapping("/create-trip")
     public void createTrip(@Valid @RequestBody TripRequestDto tripRequestDto) {
         tripService.save(tripRequestDto);
     }
@@ -57,11 +57,18 @@ public class TripController {
         tripService.delete(driverName, destinationAddress);
     }
 
-    @PutMapping
+    @PutMapping("/status")
     public void changeStatus(@RequestParam(required = false) TripStatus status,
                              @RequestParam(required = false) String driverName,
                              @RequestParam(required = false) String passengerName) {
 
         tripService.changeStatus(driverName, passengerName, status);
+    }
+
+    @PutMapping("/rid")
+    public void changeStatus(@RequestParam(required = false) String driverName,
+                             @RequestParam(required = false) String passengerName) {
+
+        tripService.endOfTrip(passengerName, driverName);
     }
 }

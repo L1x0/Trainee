@@ -9,4 +9,5 @@ public class DriverResponseDto {
     private String phoneNumber;
     private Boolean isDeleted;
     private CarResponseDto car;
+    private Boolean isBusy;
 }

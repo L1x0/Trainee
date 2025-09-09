@@ -18,6 +18,7 @@ databaseChangeLog:
               - column: { name: name, value: "Иван Водитель" }
               - column: { name: email, value: "ivan.driver@example.com" }
               - column: { name: phone_number, value: "+375291000001" }
+              - column: { name: is_busy, valueBoolean: true}
 
         - insert:
             tableName: drivers
@@ -26,6 +27,8 @@ databaseChangeLog:
               - column: { name: name, value: "Анна Водитель" }
               - column: { name: email, value: "anna.driver@example.com" }
               - column: { name: phone_number, value: "+375291000002" }
+              - column: { name: is_busy, valueBoolean: false }
+
 
         - insert:
             tableName: drivers
@@ -34,6 +37,8 @@ databaseChangeLog:
               - column: { name: name, value: "Пётр Водитель" }
               - column: { name: email, value: "petr.driver@example.com" }
               - column: { name: phone_number, value: "+375291000003" }
+              - column: { name: is_busy, valueBoolean: false }
+
 
         - insert:
             tableName: drivers
@@ -42,6 +47,8 @@ databaseChangeLog:
               - column: { name: name, value: "Ольга Водитель" }
               - column: { name: email, value: "olga.driver@example.com" }
               - column: { name: phone_number, value: "+375291000004" }
+              - column: { name: is_busy, valueBoolean: false }
+
 
         - insert:
             tableName: drivers
@@ -50,6 +57,8 @@ databaseChangeLog:
               - column: { name: name, value: "Сергей Водитель" }
               - column: { name: email, value: "sergey.driver@example.com" }
               - column: { name: phone_number, value: "+375291000005" }
+              - column: { name: is_busy, valueBoolean: true }
+
 
         # Приводим sequence (Postgres) в соответствие с максимальным id
         - sql:

@@ -1,5 +1,6 @@
 package by.astakhau.trainee.passengerservice.services;
 
+import by.astakhau.trainee.passengerservice.client.TripClient;
 import by.astakhau.trainee.passengerservice.dtos.PassengerRequestDto;
 import by.astakhau.trainee.passengerservice.dtos.PassengerResponseDto;
 import by.astakhau.trainee.passengerservice.dtos.TripRequestDto;
@@ -23,6 +24,7 @@ public class PassengerService {
 
     final private PassengerRepository passengerRepository;
     final private PassengerMapper passengerMapper;
+    final private TripClient tripClient;
 
     @Transactional
     public void savePassenger(PassengerRequestDto passengerRequestDto) {
@@ -88,7 +90,16 @@ public class PassengerService {
         if (owner.isEmpty())
             throw new IllegalArgumentException("There isn't people with same info");
         else {
-            //отправить данные на сервис поездок
+            try {
+                tripRequestDto.setId(owner.get().getId());
+
+                tripClient.createTrip(tripRequestDto);
+
+                log.info("order is created");
+
+            } catch (Exception e) {
+                log.error("Error creating trip order: {}", e.getMessage());
+            }
         }
     }
 

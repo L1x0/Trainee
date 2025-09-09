@@ -17,7 +17,7 @@ services:
 
   eureka:
     build:
-      context: ../services/EurekaService
+      context: ../services/eureka-service
       dockerfile: Dockerfile
     image: eureka-server:local
     container_name: eureka
@@ -33,7 +33,7 @@ services:
 
   driver-service:
     build:
-      context: ../services/DriverService
+      context: ../services/driver-service
       dockerfile: Dockerfile
     image: driver-service:local
     container_name: driver-service
@@ -51,6 +51,7 @@ services:
       - SERVER_PORT=8080
     ports:
       - "8081:8080"
+      - "9090:9090"
     networks:
       - backend
     healthcheck:
@@ -61,7 +62,7 @@ services:
 
   gateway-service:
     build:
-      context: ../services/GatewayService
+      context: ../services/gateway-service
       dockerfile: Dockerfile
     image: gateway-service:local
     container_name: gateway-service
@@ -89,7 +90,7 @@ services:
 
   passenger-service:
     build:
-      context: ../services/PassengerService
+      context: ../services/passenger-service
       dockerfile: Dockerfile
     image: passenger-service:local
     container_name: passenger-service
@@ -117,7 +118,7 @@ services:
 
   trip-service:
     build:
-      context: ../services/TripService
+      context: ../services/trip-service
       dockerfile: Dockerfile
     image: trip-service:local
     container_name: trip-service
@@ -145,7 +146,7 @@ services:
 
   rating-service:
     build:
-      context: ../services/RatingService
+      context: ../services/rating-service
       dockerfile: Dockerfile
     image: rating-service:local
     container_name: rating-service

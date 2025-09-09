@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+
+option java_package = "by.astakhau.trainee.grpc.driver";
+option java_multiple_files = true;
+option java_outer_classname = "DriverProto";
+
+package driver;
+
+service DriverService {
+  rpc GetDriver(google.protobuf.Empty) returns (GetDriverResponse);
+  rpc RidDriver(DriverId) returns (google.protobuf.Empty);
+}
+
+message GetDriverResponse {
+  int64 driverId = 1;
+  string name = 2;
+}
+
+message DriverId {
+  int64 driverId = 1;
+}

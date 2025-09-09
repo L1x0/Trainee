@@ -35,6 +35,9 @@ public class Driver {
     @Column(name = "deleted_at")
     private OffsetDateTime deletedAt;
 
+    @Column(name = "is_busy")
+    private Boolean isBusy;
+
     @Version
     private Integer version;
 

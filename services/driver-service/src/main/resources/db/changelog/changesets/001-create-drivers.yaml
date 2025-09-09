@@ -41,11 +41,18 @@ databaseChangeLog:
                   constraints:
                     nullable: true
               - column:
+                  name: is_busy
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
                   name: version
                   type: bigint
                   defaultValueNumeric: 0
                   constraints:
                     nullable: false
+
 
         - addNotNullConstraint:
             tableName: drivers
