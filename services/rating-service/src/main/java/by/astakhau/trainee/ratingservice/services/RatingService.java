@@ -1,7 +1,9 @@
 package by.astakhau.trainee.ratingservice.services;
 
+import by.astakhau.trainee.ratingservice.clients.TripClient;
 import by.astakhau.trainee.ratingservice.dtos.RatingRequestDto;
 import by.astakhau.trainee.ratingservice.dtos.RatingResponseDto;
+import by.astakhau.trainee.ratingservice.dtos.TripStatus;
 import by.astakhau.trainee.ratingservice.entities.RaterRole;
 import by.astakhau.trainee.ratingservice.mappers.RatingMapper;
 import by.astakhau.trainee.ratingservice.repositories.RatingRepository;
@@ -13,12 +15,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.time.OffsetDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class RatingService {
     private final RatingRepository ratingRepository;
     private final RatingMapper ratingMapper;
+    private final TripClient tripClient;
 
     public Page<RatingResponseDto> findAll(Pageable pageable) {
         return ratingRepository.findAll(pageable).map(ratingMapper::ratingToRatingResponseDto);
@@ -43,16 +48,25 @@ public class RatingService {
             return ratingMapper.ratingToRatingResponseDto(ratingRepository.save(rating.get()));
         }
 
-        log.error("No rating found for rater {} with role {}", raterId,  raterRole);
+        log.error("No rating found for rater {} with role {}", raterId, raterRole);
         return null;
     }
 
     @Transactional
     public RatingResponseDto createRating(RatingRequestDto ratingRequestDto) {
+        var trip = tripClient.findById(ratingRequestDto.getTripId());
+
+        if (trip == null || !TripStatus.COMPLETED.equals(trip.getStatus())) {
+            throw new IllegalStateException("Trip status is not COMPLETED");
+        }
+
         var rating = ratingMapper.ratingRequestDtoToRating(ratingRequestDto);
-        ratingRepository.save(rating);
+
+        rating.setId(null);
+        rating.setCreatedAt(OffsetDateTime.now());
 
         log.info("New rating is {}", rating);
+        ratingRepository.save(rating);
 
         return ratingMapper.ratingToRatingResponseDto(rating);
     }
