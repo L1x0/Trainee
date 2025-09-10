@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 public class TripResponseDto {
+    private Long id;
     private TripStatus status;
     private String destinationAddress;
     private String originAddress;

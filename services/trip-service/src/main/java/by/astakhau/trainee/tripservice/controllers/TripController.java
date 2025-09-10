@@ -57,15 +57,35 @@ public class TripController {
         tripService.delete(driverName, destinationAddress);
     }
 
-    @PutMapping("/status")
-    public void changeStatus(@RequestParam(required = false) TripStatus status,
-                             @RequestParam(required = false) String driverName,
+    @PutMapping("/accept")
+    public void acceptTrip(@RequestParam(required = false) String driverName,
                              @RequestParam(required = false) String passengerName) {
 
-        tripService.changeStatus(driverName, passengerName, status);
+        tripService.changeStatus(driverName, passengerName, TripStatus.ACCEPTED);
     }
 
-    @PutMapping("/rid")
+    @PutMapping("/cansel")
+    public void canselTrip(@RequestParam(required = false) String driverName,
+                           @RequestParam(required = false) String passengerName) {
+
+        tripService.changeStatus(driverName, passengerName, TripStatus.CANCELLED);
+    }
+
+    @PutMapping("/en-route-to-pickup")
+    public void pickUpTrip(@RequestParam(required = false) String driverName,
+                           @RequestParam(required = false) String passengerName) {
+
+        tripService.changeStatus(driverName, passengerName, TripStatus.EN_ROUTE_TO_PICKUP);
+    }
+
+    @PutMapping("/en-route-to-destination")
+    public void destinationTrip(@RequestParam(required = false) String driverName,
+                           @RequestParam(required = false) String passengerName) {
+
+        tripService.changeStatus(driverName, passengerName, TripStatus.EN_ROUTE_TO_DESTINATION);
+    }
+
+    @PutMapping("/complete")
     public void changeStatus(@RequestParam(required = false) String driverName,
                              @RequestParam(required = false) String passengerName) {
 

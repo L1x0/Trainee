@@ -95,9 +95,8 @@ public class TripService {
         log.info("save trip: {}", trip);
     }
 
-    //Разобраться со статусами!!!!!!!!!! если будет время накинуть события
     @Transactional
-    public void changeStatus(String passengerName, String driverName, TripStatus status) {// мб лучше сделать по функции на перевод в каждый статус
+    public void changeStatus(String passengerName, String driverName, TripStatus status) {
         tripRepository.findByDriverNameAndPassengerName(driverName, passengerName)
                 .ifPresent(value -> {
                     log.info("change trip status from: {}, to: {}", value.getStatus(), status);
