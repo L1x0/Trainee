@@ -3,11 +3,13 @@ package by.astakhau.trainee.driverservice.dtos;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.OffsetDateTime;
 
 @Data
+@Builder
 public class CarResponseDto {
     @NotNull
     @Size(min = 1, max = 150)

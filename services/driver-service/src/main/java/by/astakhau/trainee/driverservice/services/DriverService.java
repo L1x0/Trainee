@@ -27,24 +27,10 @@ public class DriverService {
 
     @Transactional
     public void save(DriverRequestDto driverRequestDto) {
-        Driver driver = driverMapper.fromRequestDto(driverRequestDto);
-
-        driver.setCreatedAt(OffsetDateTime.now());
-        driver.setIsDeleted(false);
-        driver.setDeletedAt(null);
-
-        var car = carMapper.fromRequestDto(driverRequestDto.getCar());
-
-        car.setCreatedAt(OffsetDateTime.now());
-        car.setIsDeleted(false);
-        car.setDeletedAt(null);
-
-        driver.setCar(car);
-        car.setDriver(driver);
+        var driver = driverMapper.fromRequestDto(driverRequestDto);
+        log.info("trying to save Driver: {}", driver);
 
         driverRepository.save(driver);
-
-        log.info("Saved Driver: {}", driver);
     }
 
     public void update(DriverRequestDto driverRequestDto) {
