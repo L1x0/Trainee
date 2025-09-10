@@ -26,21 +26,16 @@ public class TripService {
 
     public TripResponseDto createTrip(TripRequestDto passengerOrderDto) {
         log.info("Creating trip");
+
         var driver = driverGrpcClient.getDriver();
+
         log.info("driver that i had: {}", driver.toString());
 
-        //вынести в маппер
-        Trip createdTrip = new Trip();
+        Trip createdTrip = tripMapper.TripRequestDtoToTrip(passengerOrderDto);
+
         createdTrip.setDriverName(driver.getName());
-        createdTrip.setStatus(TripStatus.CREATED);
-        createdTrip.setPassengerId(passengerOrderDto.getId());
-        createdTrip.setPassengerName(passengerOrderDto.getName());
-        createdTrip.setDestinationAddress(passengerOrderDto.getDestinationAddress());
-        createdTrip.setOriginAddress(passengerOrderDto.getOriginAddress());
-        createdTrip.setPrice((int) Math.random());
+        createdTrip.setPrice((int) (Math.random() * 10));
         createdTrip.setDriverId(driver.getDriverId());
-        createdTrip.setIsDeleted(false);
-        createdTrip.setOrderDateTime(OffsetDateTime.now());
 
         tripRepository.save(createdTrip);
 
@@ -66,7 +61,7 @@ public class TripService {
 
             log.info("trip before update: {}", trip.get());
 
-            trip.get().setPassengerName(tripRequestDto.getName());
+            trip.get().setPassengerName(tripRequestDto.getPassengerName());
             trip.get().setDestinationAddress(tripRequestDto.getDestinationAddress());
             trip.get().setOriginAddress(tripRequestDto.getOriginAddress());
 

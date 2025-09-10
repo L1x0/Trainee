@@ -1,9 +1,11 @@
 package by.astakhau.trainee.tripservice.dtos;
 
 import by.astakhau.trainee.tripservice.entities.TripStatus;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class TripResponseDto {
     private Long id;
     private TripStatus status;

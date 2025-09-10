@@ -11,8 +11,8 @@
     <groupId>by.astakhau.trainee</groupId>
     <artifactId>gateway-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>GatewayService</name>
-    <description>GatewayService</description>
+    <name>gateway-service</name>
+    <description>gateway-service</description>
     <url/>
     <licenses>
         <license/>

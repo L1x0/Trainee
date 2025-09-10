@@ -1,17 +1,21 @@
 package by.astakhau.trainee.tripservice.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.OffsetDateTime;
 
-@Data
 @Entity
 @Table(name = "trips")
 @SQLDelete(sql = "UPDATE trips SET is_deleted = true WHERE id = ?")
 @SQLRestriction("is_deleted = false")
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Trip {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

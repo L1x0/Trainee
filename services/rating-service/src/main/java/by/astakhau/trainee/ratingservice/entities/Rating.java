@@ -1,13 +1,17 @@
 package by.astakhau.trainee.ratingservice.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.time.OffsetDateTime;
 
-@Data
 @Entity
 @Table(name = "trip_rating")
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Rating {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
