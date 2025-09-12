@@ -7,13 +7,17 @@ import by.astakhau.trainee.ratingservice.dtos.TripStatus;
 import by.astakhau.trainee.ratingservice.entities.RaterRole;
 import by.astakhau.trainee.ratingservice.mappers.RatingMapper;
 import by.astakhau.trainee.ratingservice.repositories.RatingRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.OffsetDateTime;
 
@@ -53,6 +57,7 @@ public class RatingService {
     }
 
     @Transactional
+    @CircuitBreaker(name = "tripService", fallbackMethod = "createTripFallback")
     public RatingResponseDto createRating(RatingRequestDto ratingRequestDto) {
         var trip = tripClient.findById(ratingRequestDto.getTripId());
 
@@ -69,6 +74,16 @@ public class RatingService {
         ratingRepository.save(rating);
 
         return ratingMapper.ratingToRatingResponseDto(rating);
+    }
+
+    public RatingResponseDto createTripFallback(RatingRequestDto ratingRequestDto, Throwable ex) {
+        log.error("tripService fallback for createTrip, ex={}", ex.toString());
+
+        if (ex instanceof HttpClientErrorException.BadRequest) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        } else {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Trip service unavailable", ex);
+        }
     }
 
 

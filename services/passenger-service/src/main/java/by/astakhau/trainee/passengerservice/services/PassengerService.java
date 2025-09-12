@@ -8,12 +8,16 @@ import by.astakhau.trainee.passengerservice.entities.Passenger;
 import by.astakhau.trainee.passengerservice.mappers.PassengerMapper;
 import by.astakhau.trainee.passengerservice.repositories.PassengerRepository;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -84,22 +88,30 @@ public class PassengerService {
     }
 
     @Transactional
+    @CircuitBreaker(name = "tripService", fallbackMethod = "createTripFallback")
     public void createTripOrder(TripRequestDto tripRequestDto) {
         var owner = getOrderOwner(tripRequestDto);
 
         if (owner.isEmpty())
             throw new IllegalArgumentException("There isn't people with same info");
         else {
-            try {
-                tripRequestDto.setId(owner.get().getId());
+            tripRequestDto.setId(owner.get().getId());
 
-                tripClient.createTrip(tripRequestDto);
+            log.info("Creating trip order for tripRequest: {}", tripRequestDto);
 
-                log.info("order is created");
+            tripClient.createTrip(tripRequestDto);
 
-            } catch (Exception e) {
-                log.error("Error creating trip order: {}", e.getMessage());
-            }
+            log.info("order is created");
+        }
+    }
+
+    public void createTripFallback(TripRequestDto tripRequestDto, Throwable ex) {
+        log.error("tripService fallback for createTrip, ex={}", ex.toString());
+
+        if (ex instanceof HttpClientErrorException.BadRequest) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        } else {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Trip service unavailable", ex);
         }
     }
 
@@ -107,7 +119,7 @@ public class PassengerService {
         log.info("Getting owner for trip request: {}", tripRequestDto.toString());
 
         return passengerRepository.findByNameAndPhoneNumber(
-                tripRequestDto.getName(),
-                tripRequestDto.getPhoneNumber());
+                tripRequestDto.getPassengerName(),
+                tripRequestDto.getPassengerPhoneNumber());
     }
 }

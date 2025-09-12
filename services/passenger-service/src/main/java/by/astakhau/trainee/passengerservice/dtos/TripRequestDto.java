@@ -13,11 +13,11 @@ public class TripRequestDto {
 
     @NotNull
     @Size(min = 1, max = 250)
-    private String name;
+    private String passengerName;
 
     @NotNull
     @Pattern(regexp = "\\+?\\d{9,15}")
-    private String phoneNumber;
+    private String passengerPhoneNumber;
 
     @NotNull
     @Size(min = 1, max = 500)
