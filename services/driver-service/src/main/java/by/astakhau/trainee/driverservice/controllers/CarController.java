@@ -5,6 +5,7 @@ import by.astakhau.trainee.driverservice.services.CarService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,12 +18,12 @@ public class CarController {
     private final CarService carService;
 
     @GetMapping("/all")
-    public Page<CarResponseDto> findAll(Pageable pageable) {
-        return carService.findAll(pageable);
+    public ResponseEntity<Page<CarResponseDto>> findAll(Pageable pageable) {
+        return ResponseEntity.ok(carService.findAll(pageable));
     }
 
     @GetMapping
-    public CarResponseDto findById(@RequestParam Long id) {
-        return carService.findById(id);
+    public ResponseEntity<CarResponseDto> findById(@RequestParam Long id) {
+        return ResponseEntity.of(carService.findById(id));
     }
 }

@@ -26,6 +26,11 @@ public class GatewayServiceApplication {
                         .uri("lb://driver-service")
                 )
 
+                .route("car-route", r -> r
+                        .path( "/cars/**")
+                        .uri("lb://driver-service")
+                )
+
                 .route("passenger-route", r -> r
                         .path("/passenger", "/passenger/**")
                         .uri("lb://passenger-service")

@@ -2,8 +2,6 @@ package by.astakhau.trainee.driverservice.services;
 
 import by.astakhau.trainee.driverservice.dtos.DriverRequestDto;
 import by.astakhau.trainee.driverservice.dtos.DriverResponseDto;
-import by.astakhau.trainee.driverservice.dtos.TripDto;
-import by.astakhau.trainee.driverservice.entities.Driver;
 import by.astakhau.trainee.driverservice.mappers.CarMapper;
 import by.astakhau.trainee.driverservice.mappers.DriverMapper;
 import by.astakhau.trainee.driverservice.repositories.DriverRepository;
@@ -13,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,41 +24,37 @@ public class DriverService {
 
 
     @Transactional
-    public void save(DriverRequestDto driverRequestDto) {
+    public DriverResponseDto save(DriverRequestDto driverRequestDto) {
         var driver = driverMapper.fromRequestDto(driverRequestDto);
         log.info("trying to save Driver: {}", driver);
 
-        driverRepository.save(driver);
+        return driverMapper.driverToDriverResponseDto(driverRepository.save(driver));
     }
 
-    public void update(DriverRequestDto driverRequestDto) {
+    public DriverResponseDto update(DriverRequestDto driverRequestDto) {
         var driver = driverRepository.findByEmail(driverRequestDto.getEmail());
 
         if (driver.isPresent()) {
-            driver.get().setEmail(driverRequestDto.getEmail());
+
             driver.get().setName(driverRequestDto.getName());
             driver.get().setPhoneNumber(driverRequestDto.getPhoneNumber());
 
+            log.info("Updated Driver: {}", driver);
 
-            driverRepository.save(driver.get());
-
-            log.info("Updated Driver: {}", driver.get());
+            return driverMapper.driverToDriverResponseDto(driverRepository.save(driver.get()));
         }
 
-        log.error("Driver is failed: {}", driver);
+        log.error("Driver is not found");
+        throw new IllegalStateException("Driver hasn't been saved before");
     }
 
     public Page<DriverResponseDto> findAll(Pageable pageable) {
-        var result = driverRepository.findAll(pageable);
-
         return driverRepository.findAll(pageable).map(driverMapper::driverToDriverResponseDto);
     }
 
 
-    public DriverResponseDto findById(Long id) {
-        Driver driver = driverRepository.findById(id).orElse(null);
-
-        return driverMapper.driverToDriverResponseDto(driver);
+    public Optional<DriverResponseDto> findById(Long id) {
+        return driverRepository.findById(id).map(driverMapper::driverToDriverResponseDto);
     }
 
     @Transactional
@@ -66,10 +62,5 @@ public class DriverService {
         driverRepository.softDeleteByNameAndEmail(name, email);
 
         log.info("Driver with name {} and email {} deleted", name, email);
-    }
-
-    //функция подбора свободного водителя для создания нового заказа
-    public TripDto getDriverForTrip() {
-        return driverRepository.findFirstById(1).map(driverMapper::DriverToTripDto).orElse(null);
     }
 }

@@ -1,5 +1,6 @@
 package by.astakhau.trainee.driverservice.repositories;
 
+import by.astakhau.trainee.driverservice.entities.Car;
 import by.astakhau.trainee.driverservice.entities.Driver;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,4 +31,6 @@ public interface DriverRepository extends JpaRepository<Driver, Long> {
     Optional<Driver> findByEmail(String email);
 
     Optional<Driver> findFirstByIsBusy(boolean isBusy);
+
+    Driver save(Driver driver);
 }
