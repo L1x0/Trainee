@@ -1,9 +1,7 @@
 package by.astakhau.trainee.driverservice.controllers;
 
-import by.astakhau.trainee.driverservice.dtos.CarResponseDto;
 import by.astakhau.trainee.driverservice.dtos.DriverRequestDto;
 import by.astakhau.trainee.driverservice.dtos.DriverResponseDto;
-import by.astakhau.trainee.driverservice.dtos.TripDto;
 import by.astakhau.trainee.driverservice.services.DriverService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +11,7 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 
@@ -29,9 +27,14 @@ public class DriverController {
     public ResponseEntity<DriverResponseDto> createDriver(@Valid @RequestBody DriverRequestDto dto) {
         var driver = driverService.save(dto);
 
-        URI location = UriComponentsBuilder.fromPath("/drivers").buildAndExpand(dto).toUri();
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/drivers")
+                .queryParam("id", driver.getId())
+                .build()
+                .toUri();
 
-        return ResponseEntity.created(location).body(driver);
+        return ResponseEntity.created(location).build();
     }
 
     @GetMapping

@@ -17,6 +17,7 @@ public class DriverMapperImpl implements DriverMapper {
     @Override
     public DriverResponseDto driverToDriverResponseDto(Driver driver) {
         return DriverResponseDto.builder()
+                .id(driver.getId())
                 .email(driver.getEmail())
                 .car(carMapper.carToCarResponseDto(driver.getCar()))
                 .isBusy(driver.getIsBusy())

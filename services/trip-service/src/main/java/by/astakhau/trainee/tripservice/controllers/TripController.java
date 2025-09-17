@@ -10,8 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,73 +26,82 @@ public class TripController {
     private final TripService tripService;
 
     @PostMapping("/create-trip")
-    public void createTrip(@Valid @RequestBody TripRequestDto tripRequestDto) {
-        tripService.save(tripRequestDto);
+    public ResponseEntity<TripResponseDto> createTrip(@Valid @RequestBody TripRequestDto tripRequestDto) {
+        var trip = tripService.createTrip(tripRequestDto);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/trips")
+                .queryParam("id", trip.getId())
+                .build()
+                .toUri();
+        
+        return ResponseEntity.created(location).body(trip);
     }
 
     @GetMapping("/all")
-    public Page<TripResponseDto> getAllTrips(Pageable pageable) {
-        return tripService.findAll(pageable);
+    public ResponseEntity<Page<TripResponseDto>> getAllTrips(Pageable pageable) {
+        return ResponseEntity.ok(tripService.findAll(pageable));
     }
 
     @GetMapping("/accepted")
-    public Page<TripResponseDto> getActiveTrips(Pageable pageable) {
-        return tripService.findAllByStatus(pageable,  TripStatus.ACCEPTED);
+    public ResponseEntity<Page<TripResponseDto>> getActiveTrips(Pageable pageable) {
+        return ResponseEntity.ok(tripService.findAllByStatus(pageable,  TripStatus.ACCEPTED));
     }
 
     @GetMapping
-    public TripResponseDto getTripById(@RequestParam(required = false) Long id) {
-        return tripService.findById(id);
+    public ResponseEntity<TripResponseDto> getTripById(@RequestParam(required = false) Long id) {
+        return ResponseEntity.of(tripService.findById(id));
     }
 
     @PutMapping("/update")
-    public TripResponseDto updateTrip(
-            @RequestParam(required = false) String passengerName,
-            @RequestParam(required = false) String driverName,
+    public ResponseEntity<TripResponseDto> updateTrip(
+            @RequestParam(required = false) Long id,
             @Valid @RequestBody TripRequestDto tripRequestDto) {
 
-        return tripService.update(passengerName, driverName, tripRequestDto);
+        return ResponseEntity.ok(tripService.update(id, tripRequestDto));
     }
 
     @DeleteMapping
-    public void deleteTrip(@RequestParam(required = false) String destinationAddress,
+    public ResponseEntity<Void> deleteTrip(@RequestParam(required = false) String destinationAddress,
                            @RequestParam(required = false) String driverName) {
 
         tripService.delete(driverName, destinationAddress);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/accept")
-    public void acceptTrip(@RequestParam(required = false) String driverName,
-                             @RequestParam(required = false) String passengerName) {
+    public ResponseEntity<Void> acceptTrip(@RequestParam(required = false) Long id) {
 
-        tripService.changeStatus(driverName, passengerName, TripStatus.ACCEPTED);
+        tripService.changeStatus(id, TripStatus.ACCEPTED);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/cansel")
-    public void canselTrip(@RequestParam(required = false) String driverName,
-                           @RequestParam(required = false) String passengerName) {
+    public ResponseEntity<Void> canselTrip(@RequestParam(required = false) Long id) {
 
-        tripService.changeStatus(driverName, passengerName, TripStatus.CANCELLED);
+        tripService.changeStatus(id, TripStatus.CANCELLED);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/en-route-to-pickup")
-    public void pickUpTrip(@RequestParam(required = false) String driverName,
-                           @RequestParam(required = false) String passengerName) {
+    public ResponseEntity<Void> pickUpTrip(@RequestParam(required = false) Long id) {
 
-        tripService.changeStatus(driverName, passengerName, TripStatus.EN_ROUTE_TO_PICKUP);
+        tripService.changeStatus(id, TripStatus.EN_ROUTE_TO_PICKUP);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/en-route-to-destination")
-    public void destinationTrip(@RequestParam(required = false) String driverName,
-                           @RequestParam(required = false) String passengerName) {
+    public ResponseEntity<Void> destinationTrip(@RequestParam(required = false) Long id) {
 
-        tripService.changeStatus(driverName, passengerName, TripStatus.EN_ROUTE_TO_DESTINATION);
+        tripService.changeStatus(id, TripStatus.EN_ROUTE_TO_DESTINATION);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/complete")
-    public void changeStatus(@RequestParam(required = false) String driverName,
-                             @RequestParam(required = false) String passengerName) {
+    public ResponseEntity<Void> changeStatus(@RequestParam(required = false) Long id) {
 
-        tripService.endOfTrip(passengerName, driverName);
+        tripService.endOfTrip(id);
+        return ResponseEntity.noContent().build();
     }
 }

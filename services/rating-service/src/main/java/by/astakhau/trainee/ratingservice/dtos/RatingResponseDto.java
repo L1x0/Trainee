@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 @Builder
 public class RatingResponseDto {
+    private Long id;
     private Long tripId;
     private Long raterId;
     private RaterRole raterRole;

@@ -42,8 +42,8 @@ public class TripService {
         return tripMapper.toTripResponseDto(createdTrip);
     }
 
-    public TripResponseDto findById(Long id) {
-        return tripMapper.toTripResponseDto(tripRepository.findById(id).orElse(null));
+    public Optional<TripResponseDto> findById(Long id) {
+        return tripRepository.findById(id).map(tripMapper::toTripResponseDto);
     }
 
     public Page<TripResponseDto> findAll(Pageable pageable) {
@@ -54,8 +54,8 @@ public class TripService {
         return tripRepository.findAllByStatus(pageable, status).map(tripMapper::toTripResponseDto);
     }
 
-    public TripResponseDto update(String passengerName, String driverName, TripRequestDto tripRequestDto) {
-        Optional<Trip> trip = tripRepository.findByDriverNameAndPassengerName(driverName, passengerName);
+    public TripResponseDto update(Long id, TripRequestDto tripRequestDto) {
+        Optional<Trip> trip = tripRepository.findById(id);
 
         if (trip.isPresent()) {
 
@@ -82,17 +82,19 @@ public class TripService {
     }
 
     @Transactional
-    public void save(TripRequestDto tripRequestDto) {
+    public TripResponseDto save(TripRequestDto tripRequestDto) {
         log.info("save trip: {}", tripRequestDto.toString());
         System.out.println("save trip");
 
         var trip = createTrip(tripRequestDto);
         log.info("save trip: {}", trip);
+
+        return trip;
     }
 
     @Transactional
-    public void changeStatus(String passengerName, String driverName, TripStatus status) {
-        tripRepository.findByDriverNameAndPassengerName(driverName, passengerName)
+    public void changeStatus(Long id, TripStatus status) {
+        tripRepository.findById(id)
                 .ifPresent(value -> {
                     log.info("change trip status from: {}, to: {}", value.getStatus(), status);
 
@@ -102,10 +104,10 @@ public class TripService {
     }
 
     @Transactional
-    public void endOfTrip(String passengerName, String driverName) {
-        log.info("end trip with DriverName: {}, PassengerName: {}", driverName, passengerName);
+    public void endOfTrip(Long id) {
+        log.info("end trip with id: {}", id);
 
-        tripRepository.findByDriverNameAndPassengerName(driverName, passengerName)
+        tripRepository.findById(id)
                 .ifPresent(value -> {
                     log.info("Trying to end trip: {}", value);
 

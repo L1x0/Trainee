@@ -4,6 +4,7 @@ import by.astakhau.trainee.passengerservice.client.TripClient;
 import by.astakhau.trainee.passengerservice.dtos.PassengerRequestDto;
 import by.astakhau.trainee.passengerservice.dtos.PassengerResponseDto;
 import by.astakhau.trainee.passengerservice.dtos.TripRequestDto;
+import by.astakhau.trainee.passengerservice.dtos.TripResponseDto;
 import by.astakhau.trainee.passengerservice.entities.Passenger;
 import by.astakhau.trainee.passengerservice.mappers.PassengerMapper;
 import by.astakhau.trainee.passengerservice.repositories.PassengerRepository;
@@ -31,20 +32,22 @@ public class PassengerService {
     final private TripClient tripClient;
 
     @Transactional
-    public void savePassenger(PassengerRequestDto passengerRequestDto) {
+    public PassengerResponseDto savePassenger(PassengerRequestDto passengerRequestDto) {
         Passenger passenger = passengerMapper.fromRequestDto(passengerRequestDto);
 
         passenger.setDeletedAt(null);
         passenger.setIsDeleted(false);
 
-        passengerRepository.save(passenger);
+        var savedPassenger = passengerRepository.save(passenger);
 
         log.info("Passenger saved with ID: {}, phone number: {}, email: {}",
                 passenger.getId(), passenger.getPhoneNumber(), passenger.getEmail());
+
+        return passengerMapper.passengerToPassengerResponseDto(savedPassenger);
     }
 
-    public PassengerResponseDto findById(Long id) {
-        return passengerMapper.passengerToPassengerResponseDto(passengerRepository.findById(id).orElse(null));
+    public Optional<PassengerResponseDto> findById(Long id) {
+        return passengerRepository.findById(id).map(passengerMapper::passengerToPassengerResponseDto);
     }
 
     public Page<PassengerResponseDto> findAll(Pageable pageable) {
@@ -62,7 +65,7 @@ public class PassengerService {
     }
 
     @Transactional
-    public void update(String name, String phoneNumber, PassengerRequestDto passengerRequestDto) {
+    public PassengerResponseDto update(String name, String phoneNumber, PassengerRequestDto passengerRequestDto) {
         var passenger = passengerRepository.findByNameAndPhoneNumber(name, phoneNumber);
 
         if (passenger.isPresent()) {
@@ -73,10 +76,11 @@ public class PassengerService {
             passengerRepository.save(passenger.get());
 
             log.info("Passenger updated");
-            return;
+            return passengerMapper.passengerToPassengerResponseDto(passenger.get());
         }
 
         log.error("No passenger found with name: {}, phoneNumber: {}", name, phoneNumber);
+        throw new IllegalStateException("No passenger found with name: " + name);
     }
 
 
@@ -89,7 +93,7 @@ public class PassengerService {
 
     @Transactional
     @CircuitBreaker(name = "tripService", fallbackMethod = "createTripFallback")
-    public void createTripOrder(TripRequestDto tripRequestDto) {
+    public TripResponseDto createTripOrder(TripRequestDto tripRequestDto) {
         var owner = getOrderOwner(tripRequestDto);
 
         if (owner.isEmpty())
@@ -99,13 +103,15 @@ public class PassengerService {
 
             log.info("Creating trip order for tripRequest: {}", tripRequestDto);
 
-            tripClient.createTrip(tripRequestDto);
+            var trip = tripClient.createTrip(tripRequestDto);
 
-            log.info("order is created");
+            log.info("order is created, trip: {}", trip);
+
+            return trip;
         }
     }
 
-    public void createTripFallback(TripRequestDto tripRequestDto, Throwable ex) {
+    public TripResponseDto createTripFallback(TripRequestDto tripRequestDto, Throwable ex) {
         log.error("tripService fallback for createTrip, ex={}", ex.toString());
 
         if (ex instanceof HttpClientErrorException.BadRequest) {

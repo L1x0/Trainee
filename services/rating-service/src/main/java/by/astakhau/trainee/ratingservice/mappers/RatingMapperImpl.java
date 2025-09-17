@@ -25,6 +25,7 @@ public class RatingMapperImpl implements RatingMapper {
     @Override
     public RatingResponseDto ratingToRatingResponseDto(Rating rating) {
         return RatingResponseDto.builder()
+                .id(rating.getId())
                 .comment(rating.getComment())
                 .score(rating.getScore())
                 .tripId(rating.getTripId())
