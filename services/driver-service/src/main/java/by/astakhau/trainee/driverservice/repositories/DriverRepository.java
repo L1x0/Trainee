@@ -1,6 +1,5 @@
 package by.astakhau.trainee.driverservice.repositories;
 
-import by.astakhau.trainee.driverservice.entities.Car;
 import by.astakhau.trainee.driverservice.entities.Driver;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,9 +23,6 @@ public interface DriverRepository extends JpaRepository<Driver, Long> {
     @Modifying
     @Query(value = "UPDATE drivers SET is_busy = false WHERE id = :driver_id", nativeQuery = true)
     void ridDriver(@Param("driver_id") Long driverId);
-
-    //придумать как искать свободных водителей
-    Optional<Driver> findFirstById(long id);
 
     Optional<Driver> findByEmail(String email);
 

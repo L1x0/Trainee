@@ -1,6 +1,5 @@
 package by.astakhau.trainee.tripservice.controllers;
 
-import by.astakhau.trainee.tripservice.dtos.PassengerOrderDto;
 import by.astakhau.trainee.tripservice.dtos.TripRequestDto;
 import by.astakhau.trainee.tripservice.dtos.TripResponseDto;
 import by.astakhau.trainee.tripservice.entities.TripStatus;
