@@ -80,6 +80,7 @@ services:
     depends_on:
       - eureka
       - postgres
+      - kafka
     environment:
       - SPRING_PROFILES_ACTIVE=local
       - SPRING_APPLICATION_NAME=passenger-service
@@ -101,6 +102,7 @@ services:
     image: trip-service:local
     container_name: trip-service
     depends_on:
+      - kafka
       - eureka
       - postgres
     environment:
@@ -147,6 +149,8 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "2181:2181"
+    networks:
+      - backend
 
 
   kafka:
@@ -162,7 +166,11 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+    networks:
+      - backend
 
 
   kafka-init:
@@ -179,6 +187,19 @@ services:
       echo "topics created";
       '
     restart: "no"
+    networks:
+      - backend
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    depends_on:
+      - kafka
+    ports:
+      - "9000:9000"
+    environment:
+      KAFKA_BROKERCONNECT: kafka:9092
+    networks:
+      - backend
 
 
 #  redis:

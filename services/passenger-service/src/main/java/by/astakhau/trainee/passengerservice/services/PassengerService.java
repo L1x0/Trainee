@@ -6,6 +6,7 @@ import by.astakhau.trainee.passengerservice.dtos.PassengerResponseDto;
 import by.astakhau.trainee.passengerservice.dtos.TripRequestDto;
 import by.astakhau.trainee.passengerservice.dtos.TripResponseDto;
 import by.astakhau.trainee.passengerservice.entities.Passenger;
+import by.astakhau.trainee.passengerservice.kafka.KafkaProducer;
 import by.astakhau.trainee.passengerservice.mappers.PassengerMapper;
 import by.astakhau.trainee.passengerservice.repositories.PassengerRepository;
 
@@ -30,8 +31,9 @@ public class PassengerService {
     final private PassengerRepository passengerRepository;
     final private PassengerMapper passengerMapper;
     final private TripClient tripClient;
+    final private KafkaProducer kafkaProducer;
 
-    @Transactional
+    @Transactional("transactionManager")
     public PassengerResponseDto savePassenger(PassengerRequestDto passengerRequestDto) {
         Passenger passenger = passengerMapper.fromRequestDto(passengerRequestDto);
 
@@ -64,7 +66,7 @@ public class PassengerService {
         return results.map(passengerMapper::passengerToPassengerResponseDto);
     }
 
-    @Transactional
+    @Transactional("transactionManager")
     public PassengerResponseDto update(String name, String phoneNumber, PassengerRequestDto passengerRequestDto) {
         var passenger = passengerRepository.findByNameAndPhoneNumber(name, phoneNumber);
 
@@ -84,14 +86,14 @@ public class PassengerService {
     }
 
 
-    @Transactional
+    @Transactional("transactionManager")
     public void deleteWithEmail(String name, String email) {
         passengerRepository.softDeleteByNameAndEmail(name, email);
 
         log.info("Passengers deleted with name: {}, email: {}", name, email);
     }
 
-    @Transactional
+    @Transactional("transactionManager")
     @CircuitBreaker(name = "tripService", fallbackMethod = "createTripFallback")
     public TripResponseDto createTripOrder(TripRequestDto tripRequestDto) {
         var owner = getOrderOwner(tripRequestDto);
@@ -103,11 +105,12 @@ public class PassengerService {
 
             log.info("Creating trip order for tripRequest: {}", tripRequestDto);
 
-            var trip = tripClient.createTrip(tripRequestDto);
+            kafkaProducer.sendTripRequest(tripRequestDto);
 
-            log.info("order is created, trip: {}", trip);
+            //var trip = tripClient.createTrip(tripRequestDto);
+            //log.info("order is created, trip: {}", trip);
 
-            return trip;
+            return null;
         }
     }
 
