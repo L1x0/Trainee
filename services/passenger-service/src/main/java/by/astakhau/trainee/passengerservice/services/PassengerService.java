@@ -99,10 +99,12 @@ public class PassengerService {
     public void createTripOrder(TripRequestDto tripRequestDto) {
         var owner = getOrderOwner(tripRequestDto);
 
+        if (owner.isPresent() && !owner.get().getName().equals(tripRequestDto.getPassengerName())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT);
+        }
         if (owner.isEmpty())
             throw new IllegalArgumentException("There isn't people with same info");
         else {
-            tripRequestDto.setId(owner.get().getId());
 
             log.info("Creating trip order for tripRequest: {}", tripRequestDto);
 

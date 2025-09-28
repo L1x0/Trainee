@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 @Builder
 public class TripRequestDto {
-    private long id;
+    private long passengerId;
 
     @NotNull
     @Size(min = 1, max = 250)
