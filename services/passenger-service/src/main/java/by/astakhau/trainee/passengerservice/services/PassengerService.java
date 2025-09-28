@@ -123,8 +123,7 @@ public class PassengerService {
         }
     }
 
-    public TripResponseDto getTripInfo(String passengerName) {
-
+    public Optional<TripResponseDto> getTripInfo(String passengerName) {
         return tripInfoService.getTripInfo(passengerName);
     }
 

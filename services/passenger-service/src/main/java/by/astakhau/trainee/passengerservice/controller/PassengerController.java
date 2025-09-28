@@ -89,6 +89,6 @@ public class PassengerController {
 
     @GetMapping("/get-trip-info")
     public ResponseEntity<TripResponseDto> getTripInfo(@Valid @RequestParam String passengerName) {
-        return ResponseEntity.ok(passengerService.getTripInfo(passengerName));
+        return ResponseEntity.of(passengerService.getTripInfo(passengerName));
     }
 }

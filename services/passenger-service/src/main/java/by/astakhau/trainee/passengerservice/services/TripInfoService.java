@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -24,33 +26,46 @@ public class TripInfoService {
 
         var trip = tripRepository.findById(tripResponseDto.getId());
 
+        boolean isPresent = trip.isPresent();
+
+        if (isPresent) {
+            if (tripMapper.toTripResponse(trip.get()).equals(tripResponseDto)) {
+                return;
+            }
+        }
 
         if (TripStatus.COMPLETED.equals(tripResponseDto.getStatus())) {
-            if (trip.isEmpty()) {
-                throw new ResourceNotFoundException("Trip not found");
-            } else {
-
-                trip.get().setStatus(tripResponseDto.getStatus());
-                tripRepository.save(trip.get());
-                log.info("Updated trip response: {}", tripResponseDto);
-            }
+            updateTripStatus(tripResponseDto, trip,  isPresent);
         } else {
-            if (trip.isPresent()) {
-                throw new IllegalStateException("Trip already exists");
-            } else {
-                tripRepository.save(tripMapper.toTripInfo(tripResponseDto));
-                log.info("Saved trip response: {}", tripResponseDto);
-            }
+            saveNewTripInfo(tripResponseDto, isPresent);
         }
     }
 
-    public TripResponseDto getTripInfo(String passengerName) {
-        var trip = tripRepository.findActiveTripsByPassengerName(passengerName);
-
-        if (trip.isEmpty()) {
-            throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Trip not found");
+    private void updateTripStatus(TripResponseDto tripResponseDto, Optional<TripInfo> trip, boolean isPresent) {
+        if (!isPresent) {
+            throw new ResourceNotFoundException("Trip not found");
         } else {
-            return tripMapper.toTripResponse(trip.get());
+
+            if (TripStatus.COMPLETED.equals(trip.get().getStatus()))
+                return;
+
+            trip.get().setStatus(TripStatus.COMPLETED);
+            tripRepository.save(trip.get());
+            log.info("Updated trip response: {}", tripResponseDto);
         }
+    }
+
+    private void saveNewTripInfo(TripResponseDto tripResponseDto, boolean isPresent) {
+        if (isPresent) {
+            throw new IllegalStateException("Trip already exists");
+        } else {
+            tripRepository.save(tripMapper.toTripInfo(tripResponseDto));
+            log.info("Saved trip response: {}", tripResponseDto);
+        }
+    }
+
+    public Optional<TripResponseDto> getTripInfo(String passengerName) {
+        var trip = tripRepository.findActiveTripsByPassengerName(passengerName);
+        return trip.map(tripMapper::toTripResponse);
     }
 }

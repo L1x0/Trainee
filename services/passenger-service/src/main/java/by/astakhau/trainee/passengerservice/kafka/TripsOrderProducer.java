@@ -18,8 +18,6 @@ public class TripsOrderProducer {
     public void sendTripRequest(TripRequestDto tripRequest) {
         log.info("Sending trip request to kafka-broker: {}", tripRequest);
 
-        log.info("Sending trip request to kafka-broker: {}", tripRequest);
-
         kafkaTemplate.executeInTransaction(kt -> {
             kt.send("trips.make", tripRequest);
             return null;
