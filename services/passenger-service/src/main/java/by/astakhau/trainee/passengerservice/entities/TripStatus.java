@@ -1,4 +1,4 @@
-package by.astakhau.trainee.passengerservice.dtos;
+package by.astakhau.trainee.passengerservice.entities;
 
 public enum TripStatus {
     CREATED,

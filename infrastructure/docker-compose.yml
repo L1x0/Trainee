@@ -178,7 +178,6 @@ services:
     container_name: kafka-init
     depends_on:
       - kafka
-    # Список команд: ждём, пока broker отдаст список топиков, затем создаём нужные темы.
     command: >
       sh -c '
       echo "creating topics (if not exists)...";

@@ -7,6 +7,7 @@ import by.astakhau.trainee.passengerservice.dtos.TripResponseDto;
 import by.astakhau.trainee.passengerservice.services.PassengerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.kafka.shaded.com.google.protobuf.Empty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -80,16 +81,14 @@ public class PassengerController {
 
 
     @PostMapping("/create-order")
-    public ResponseEntity<TripResponseDto> createOrder(@Valid @RequestBody TripRequestDto tripRequestDto) {
-        var trip = passengerService.createTripOrder(tripRequestDto);
+    public ResponseEntity<Empty> createOrder(@Valid @RequestBody TripRequestDto tripRequestDto) {
+        passengerService.createTripOrder(tripRequestDto);
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentContextPath()
-                .path("/trips")
-                .queryParam("id", trip.getId())
-                .build()
-                .toUri();
+        return ResponseEntity.noContent().build();
+    }
 
-        return ResponseEntity.created(location).build();
+    @GetMapping("/get-trip-info")
+    public ResponseEntity<TripResponseDto> getTripInfo(@Valid @RequestParam String passengerName) {
+        return ResponseEntity.ok(passengerService.getTripInfo(passengerName));
     }
 }

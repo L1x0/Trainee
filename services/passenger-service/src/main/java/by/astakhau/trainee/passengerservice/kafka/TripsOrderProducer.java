@@ -8,13 +8,12 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class KafkaProducer {
+public class TripsOrderProducer {
+    private final KafkaTemplate<String, TripRequestDto> kafkaTemplate;
 
-    public KafkaProducer(@Autowired KafkaTemplate<String, TripRequestDto> kafkaTemplate) {
+    public TripsOrderProducer(@Autowired KafkaTemplate<String, TripRequestDto> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
-
-    private final KafkaTemplate<String, TripRequestDto> kafkaTemplate;
 
     public void sendTripRequest(TripRequestDto tripRequest) {
         log.info("Sending trip request to kafka-broker: {}", tripRequest);

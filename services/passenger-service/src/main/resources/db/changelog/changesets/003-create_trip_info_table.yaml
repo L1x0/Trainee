@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-create-trip_info_table
+      author: artemastahov
+      preConditions:
+        - onFail: HALT
+        - dbms:
+            type: postgresql
+      changes:
+        - createTable:
+            tableName: trips
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: destination_address
+                  type: VARCHAR(255)
+              - column:
+                  name: origin_address
+                  type: VARCHAR(255)
+              - column:
+                  name: price
+                  type: NUMERIC(10,2)
+              - column:
+                  name: passenger_name
+                  type: VARCHAR(200)
+              - column:
+                  name: driver_name
+                  type: VARCHAR(200)
+      rollback:
+        - dropTable:
+            tableName: trips

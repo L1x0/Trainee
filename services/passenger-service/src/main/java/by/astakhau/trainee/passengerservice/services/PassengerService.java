@@ -6,7 +6,7 @@ import by.astakhau.trainee.passengerservice.dtos.PassengerResponseDto;
 import by.astakhau.trainee.passengerservice.dtos.TripRequestDto;
 import by.astakhau.trainee.passengerservice.dtos.TripResponseDto;
 import by.astakhau.trainee.passengerservice.entities.Passenger;
-import by.astakhau.trainee.passengerservice.kafka.KafkaProducer;
+import by.astakhau.trainee.passengerservice.kafka.TripsOrderProducer;
 import by.astakhau.trainee.passengerservice.mappers.PassengerMapper;
 import by.astakhau.trainee.passengerservice.repositories.PassengerRepository;
 
@@ -30,8 +30,9 @@ public class PassengerService {
 
     final private PassengerRepository passengerRepository;
     final private PassengerMapper passengerMapper;
-    final private TripClient tripClient;
-    final private KafkaProducer kafkaProducer;
+    //final private TripClient tripClient;
+    final private TripsOrderProducer tripsOrderProducer;
+    private final TripInfoService tripInfoService;
 
     @Transactional("transactionManager")
     public PassengerResponseDto savePassenger(PassengerRequestDto passengerRequestDto) {
@@ -95,7 +96,7 @@ public class PassengerService {
 
     @Transactional("transactionManager")
     @CircuitBreaker(name = "tripService", fallbackMethod = "createTripFallback")
-    public TripResponseDto createTripOrder(TripRequestDto tripRequestDto) {
+    public void createTripOrder(TripRequestDto tripRequestDto) {
         var owner = getOrderOwner(tripRequestDto);
 
         if (owner.isEmpty())
@@ -105,16 +106,14 @@ public class PassengerService {
 
             log.info("Creating trip order for tripRequest: {}", tripRequestDto);
 
-            kafkaProducer.sendTripRequest(tripRequestDto);
+            tripsOrderProducer.sendTripRequest(tripRequestDto);
 
-            //var trip = tripClient.createTrip(tripRequestDto);
-            //log.info("order is created, trip: {}", trip);
-
-            return null;
+            /*var trip = tripClient.createTrip(tripRequestDto);
+            log.info("order is created, trip: {}", trip);*/
         }
     }
 
-    public TripResponseDto createTripFallback(TripRequestDto tripRequestDto, Throwable ex) {
+    public void createTripFallback(TripRequestDto tripRequestDto, Throwable ex) {
         log.error("tripService fallback for createTrip, ex={}", ex.toString());
 
         if (ex instanceof HttpClientErrorException.BadRequest) {
@@ -122,6 +121,11 @@ public class PassengerService {
         } else {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Trip service unavailable", ex);
         }
+    }
+
+    public TripResponseDto getTripInfo(String passengerName) {
+
+        return tripInfoService.getTripInfo(passengerName);
     }
 
     private Optional<Passenger> getOrderOwner(TripRequestDto tripRequestDto) {
