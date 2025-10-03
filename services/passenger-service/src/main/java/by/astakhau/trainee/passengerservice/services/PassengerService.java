@@ -1,6 +1,6 @@
 package by.astakhau.trainee.passengerservice.services;
 
-import by.astakhau.trainee.passengerservice.client.TripClient;
+//import by.astakhau.trainee.passengerservice.client.TripClient;
 import by.astakhau.trainee.passengerservice.dtos.PassengerRequestDto;
 import by.astakhau.trainee.passengerservice.dtos.PassengerResponseDto;
 import by.astakhau.trainee.passengerservice.dtos.TripRequestDto;
@@ -37,9 +37,6 @@ public class PassengerService {
     @Transactional("transactionManager")
     public PassengerResponseDto savePassenger(PassengerRequestDto passengerRequestDto) {
         Passenger passenger = passengerMapper.fromRequestDto(passengerRequestDto);
-
-        passenger.setDeletedAt(null);
-        passenger.setIsDeleted(false);
 
         var savedPassenger = passengerRepository.save(passenger);
 

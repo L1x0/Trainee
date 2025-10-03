@@ -20,7 +20,6 @@ import java.util.Optional;
 public class DriverService {
     private final DriverRepository driverRepository;
     private final DriverMapper driverMapper;
-    private final CarMapper carMapper;
 
 
     @Transactional

@@ -10,5 +10,5 @@ import java.util.Optional;
 
 public interface CarRepository extends JpaRepository<Car, Long> {
     @Query(value = "SELECT * FROM cars WHERE id = ?", nativeQuery = true)
-    Optional<Car> findById(long id);
+    Optional<Car> findById(Long id);
 }

@@ -29,13 +29,13 @@ public class CreatedTripsConsumer {
         log.info("Received record: {}", record);
 
         kafkaTemplate.executeInTransaction(kt -> {
+            tripService.saveOrUpdateTripInfo(record.value());
+
             TopicPartition tp = new TopicPartition(record.topic(), record.partition());
             OffsetAndMetadata oam = new OffsetAndMetadata(record.offset() + 1);
             Map<TopicPartition, OffsetAndMetadata> offsets = Collections.singletonMap(tp, oam);
 
             kt.sendOffsetsToTransaction(offsets, groupId);
-
-            tripService.saveOrUpdateTripInfo(record.value());
 
             return null;
         });

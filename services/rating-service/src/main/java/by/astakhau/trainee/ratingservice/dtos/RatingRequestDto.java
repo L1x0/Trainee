@@ -18,7 +18,7 @@ public class RatingRequestDto {
     @Nullable
     private Byte score;
 
-    @Max(500)
+    @Size(min = 1, max = 500)
     @Nullable
     private String comment;
 

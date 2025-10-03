@@ -38,7 +38,7 @@ public class RatingService {
     }
 
     @Transactional
-    public RatingResponseDto update(Long raterId, RaterRole raterRole, @RequestBody RatingRequestDto ratingRequestDto) {
+    public RatingResponseDto update(Long raterId, RaterRole raterRole, RatingRequestDto ratingRequestDto) {
         var rating = ratingRepository.findByRaterRoleAndRaterId(raterRole, raterId);
 
         if (rating.isPresent()) {
@@ -66,9 +66,6 @@ public class RatingService {
         }
 
         var rating = ratingMapper.ratingRequestDtoToRating(ratingRequestDto);
-
-        rating.setId(null);
-        rating.setCreatedAt(OffsetDateTime.now());
 
         log.info("New rating is {}", rating);
         ratingRepository.save(rating);

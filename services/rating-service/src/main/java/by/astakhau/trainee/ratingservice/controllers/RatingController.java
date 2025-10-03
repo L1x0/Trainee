@@ -43,14 +43,14 @@ public class RatingController {
     public ResponseEntity<RatingResponseDto> createRating(@Valid @RequestBody RatingRequestDto ratingRequestDto) {
         var rating = ratingService.createRating(ratingRequestDto);
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentContextPath()
-                .path("/rating")
-                .queryParam("id", rating.getId())
-                .build()
-                .toUri();
+//        URI location = ServletUriComponentsBuilder
+//                .fromCurrentContextPath()
+//                .path("/rating")
+//                .queryParam("id", rating.getId())
+//                .build()
+//                .toUri();
 
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/update")

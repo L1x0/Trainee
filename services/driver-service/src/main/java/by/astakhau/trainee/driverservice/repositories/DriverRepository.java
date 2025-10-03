@@ -14,7 +14,7 @@ public interface DriverRepository extends JpaRepository<Driver, Long> {
     Page<Driver> findByName(String name, Pageable pageable);
 
     @Query(value = "SELECT * FROM drivers JOIN cars on drivers.id = cars.driver_id where driver_id = 1;", nativeQuery = true)
-    Optional<Driver> findById(long id);
+    Optional<Driver> findById(Long id);
 
     @Modifying
     @Query(value = "UPDATE drivers SET is_deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE name = :name AND email = :email", nativeQuery = true)

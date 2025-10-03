@@ -1,4 +1,4 @@
-package by.astakhau.trainee.tripservice.services;
+package by.astakhau.trainee.tripservice.grpc;
 
 import by.astakhau.trainee.grpc.driver.DriverId;
 import by.astakhau.trainee.grpc.driver.DriverServiceGrpc;

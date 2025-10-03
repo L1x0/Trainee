@@ -4,6 +4,7 @@ import by.astakhau.trainee.tripservice.dtos.TripRequestDto;
 import by.astakhau.trainee.tripservice.dtos.TripResponseDto;
 import by.astakhau.trainee.tripservice.entities.Trip;
 import by.astakhau.trainee.tripservice.entities.TripStatus;
+import by.astakhau.trainee.tripservice.grpc.DriverGrpcClient;
 import by.astakhau.trainee.tripservice.kafka.CreatedTripsProducer;
 import by.astakhau.trainee.tripservice.mappers.TripMapper;
 import by.astakhau.trainee.tripservice.repositories.TripRepository;
@@ -83,16 +84,6 @@ public class TripService {
         tripRepository.softDelete(driverName, destinationAddress);
     }
 
-    public TripResponseDto save(TripRequestDto tripRequestDto) {
-        log.info("save trip: {}", tripRequestDto.toString());
-        System.out.println("save trip");
-
-        var trip = createTrip(tripRequestDto);
-        log.info("save trip: {}", trip);
-
-        return trip;
-    }
-
     @Transactional("transactionManager")
     public void changeStatus(Long id, TripStatus status) {
         var trip = tripRepository.findById(id);
@@ -115,6 +106,22 @@ public class TripService {
         }
     }
 
+    @Transactional("transactionManager")
+    public void changeStatus(Trip trip, TripStatus status) {
+
+
+        log.info("change trip status from: {}, to: {}", trip.getStatus(), status);
+
+        trip.setStatus(status);
+        tripRepository.save(trip);
+
+        if (TripStatus.COMPLETED.equals(status)) {
+            log.info("trip has been completed, invoke kafka producer");
+            createdTripsProducer.send(tripMapper.toTripResponseDto(trip));
+        }
+
+    }
+
 
     @Transactional("transactionManager")
     public void endOfTrip(Long id) {
@@ -124,10 +131,9 @@ public class TripService {
                 .ifPresent(value -> {
                     log.info("Trying to end trip: {}", value);
 
-                    this.changeStatus(id, TripStatus.COMPLETED);
+                    this.changeStatus(value, TripStatus.COMPLETED);
 
                     driverGrpcClient.ridDriver(value.getDriverId());
-                    tripRepository.save(value);
                 });
     }
 }

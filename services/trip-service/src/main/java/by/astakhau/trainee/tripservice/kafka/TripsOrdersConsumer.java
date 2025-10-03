@@ -30,17 +30,17 @@ public class TripsOrdersConsumer {
         var groupId = consumer.groupMetadata();
 
         kafkaTemplate.executeInTransaction(kt -> {
-            TopicPartition tp = new TopicPartition(record.topic(), record.partition());
-            OffsetAndMetadata oam = new OffsetAndMetadata(record.offset() + 1);
-            Map<TopicPartition, OffsetAndMetadata> offsets = Collections.singletonMap(tp, oam);
-
-            kt.sendOffsetsToTransaction(offsets, groupId);
-
             log.info("Received trip request: {}", dto);
 
             var tripResponse = tripService.createTrip(dto);
 
             createdTripsProducer.send(tripResponse);
+
+            TopicPartition tp = new TopicPartition(record.topic(), record.partition());
+            OffsetAndMetadata oam = new OffsetAndMetadata(record.offset() + 1);
+            Map<TopicPartition, OffsetAndMetadata> offsets = Collections.singletonMap(tp, oam);
+
+            kt.sendOffsetsToTransaction(offsets, groupId);
 
             return null;
         });
