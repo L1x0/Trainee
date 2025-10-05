@@ -161,6 +161,6 @@ public class RatingServiceTest {
     @Test
     void deleteRating() {
         ratingService.deleteRating(RaterRole.PASSENGER, "comment");
-        verify(ratingRepository).deleteByRaterRoleAndComment(RaterRole.PASSENGER, "comment");
+        verify(ratingRepository).deleteByRaterRoleAndComment(String.valueOf(RaterRole.PASSENGER), "comment");
     }
 }

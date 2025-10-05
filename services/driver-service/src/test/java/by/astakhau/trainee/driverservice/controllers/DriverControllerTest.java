@@ -103,18 +103,6 @@ public class DriverControllerTest {
                 .phoneNumber("+375447006485")
                 .build();
 
-        var driver = Driver.builder()
-                .email("email")
-                .name("name")
-                .id(1L)
-                .phoneNumber("phoneNumber")
-                .car(new Car())
-                .createdAt(null)
-                .deletedAt(null)
-                .isBusy(false)
-                .isDeleted(false)
-                .version(0)
-                .build();
 
         var response = DriverResponseDto.builder()
                 .id(1L)

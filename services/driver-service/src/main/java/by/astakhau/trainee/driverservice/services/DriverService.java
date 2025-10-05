@@ -2,7 +2,6 @@ package by.astakhau.trainee.driverservice.services;
 
 import by.astakhau.trainee.driverservice.dtos.DriverRequestDto;
 import by.astakhau.trainee.driverservice.dtos.DriverResponseDto;
-import by.astakhau.trainee.driverservice.mappers.CarMapper;
 import by.astakhau.trainee.driverservice.mappers.DriverMapper;
 import by.astakhau.trainee.driverservice.repositories.DriverRepository;
 import lombok.RequiredArgsConstructor;

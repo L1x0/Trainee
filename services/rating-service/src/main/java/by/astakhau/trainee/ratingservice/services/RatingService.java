@@ -86,7 +86,7 @@ public class RatingService {
 
     @Transactional
     public void deleteRating(RaterRole raterRole, String raterComment) {
-        ratingRepository.deleteByRaterRoleAndComment(raterRole, raterComment);
+        ratingRepository.deleteByRaterRoleAndComment(raterRole.toString(), raterComment);
 
         log.info("Deleted rating for rater {} with comment {}", raterRole, raterComment);
     }

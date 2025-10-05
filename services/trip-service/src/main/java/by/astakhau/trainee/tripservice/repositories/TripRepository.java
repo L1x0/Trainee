@@ -22,7 +22,7 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
     Optional<Trip> findById(Long id);
 
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query(value = "UPDATE trips SET is_deleted = true" +
             " WHERE driver_name = :name AND destination_address = :destination_address", nativeQuery = true)
     void softDelete(@Param("name") String name, @Param("destination_address") String destination_address);

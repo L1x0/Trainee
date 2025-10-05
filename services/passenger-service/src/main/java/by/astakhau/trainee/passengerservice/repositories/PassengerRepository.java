@@ -17,7 +17,7 @@ public interface PassengerRepository extends JpaRepository<Passenger, Long> {
     @Query(value = "SELECT * FROM passengers WHERE id = ?", nativeQuery = true)
     Optional<Passenger> findById(Long id);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query(value = "UPDATE passengers SET is_deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE name = :name AND email = :email", nativeQuery = true)
     void softDeleteByNameAndEmail(@Param("name") String name, @Param("email") String email);
 

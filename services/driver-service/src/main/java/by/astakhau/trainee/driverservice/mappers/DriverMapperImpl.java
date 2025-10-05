@@ -24,6 +24,7 @@ public class DriverMapperImpl implements DriverMapper {
                 .name(driver.getName())
                 .email(driver.getEmail())
                 .phoneNumber(driver.getPhoneNumber())
+                .isDeleted(driver.getIsDeleted())
                 .build();
     }
 
