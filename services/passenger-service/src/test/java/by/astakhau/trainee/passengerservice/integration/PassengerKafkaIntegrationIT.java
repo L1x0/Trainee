@@ -20,6 +20,9 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.apache.kafka.clients.admin.*;
+import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.errors.UnknownTopicOrPartitionException;
 
 
 import java.time.Duration;
@@ -58,6 +61,8 @@ class PassengerKafkaIntegrationIT extends AbstractIntegrationTest {
     @BeforeAll
     void beforeAll() throws Exception {
         createTopics(KAFKA.getBootstrapServers(), TOPIC_TRIPS_MAKE, TOPIC_TRIPS_CREATED);
+        truncateTopic(KAFKA.getBootstrapServers(), TOPIC_TRIPS_MAKE);
+        truncateTopic(KAFKA.getBootstrapServers(), TOPIC_TRIPS_CREATED);
 
         responderRunning = new AtomicBoolean(true);
         responderExecutor = Executors.newSingleThreadExecutor(r -> {
@@ -173,6 +178,39 @@ class PassengerKafkaIntegrationIT extends AbstractIntegrationTest {
             } catch (InterruptedException | TimeoutException ex) {
                 throw ex;
             }
+        }
+    }
+
+    public static void truncateTopic(String bootstrapServers, String topic) throws Exception {
+        Properties props = new Properties();
+        props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+
+        try (AdminClient admin = AdminClient.create(props)) {
+            TopicDescription desc = admin.describeTopics(Collections.singletonList(topic))
+                    .all().get().get(topic);
+
+            List<TopicPartition> partitions = desc.partitions().stream()
+                    .map(p -> new TopicPartition(topic, p.partition()))
+                    .collect(Collectors.toList());
+
+            if (partitions.isEmpty()) return;
+
+            Map<TopicPartition, OffsetSpec> request = new HashMap<>();
+            for (TopicPartition tp : partitions) {
+                request.put(tp, OffsetSpec.latest());
+            }
+
+            Map<TopicPartition, ListOffsetsResult.ListOffsetsResultInfo> offsets =
+                    admin.listOffsets(request).all().get();
+
+            Map<TopicPartition, RecordsToDelete> toDelete = new HashMap<>();
+            for (Map.Entry<TopicPartition, ListOffsetsResult.ListOffsetsResultInfo> e : offsets.entrySet()) {
+                long latest = e.getValue().offset();
+                toDelete.put(e.getKey(), RecordsToDelete.beforeOffset(latest));
+            }
+
+            admin.deleteRecords(toDelete).all().get();
+            Thread.sleep(200);
         }
     }
 

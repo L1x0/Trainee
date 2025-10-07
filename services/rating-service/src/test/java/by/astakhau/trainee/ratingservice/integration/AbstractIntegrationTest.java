@@ -20,7 +20,7 @@ public abstract class AbstractIntegrationTest {
                     .withUsername("rating_user")
                     .withPassword("dev");
 
-    static final WireMockServer WIREMOCK = new WireMockServer(options().dynamicPort());
+    protected static final WireMockServer WIREMOCK = new WireMockServer(options().dynamicPort());
 
     static {
         WIREMOCK.start();
@@ -32,6 +32,7 @@ public abstract class AbstractIntegrationTest {
         registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
         registry.add("spring.datasource.username", POSTGRES::getUsername);
         registry.add("spring.datasource.password", POSTGRES::getPassword);
+
         registry.add("eureka.client.register-with-eureka", () -> "false");
         registry.add("eureka.client.fetch-registry", () -> "false");
 

@@ -21,7 +21,7 @@ public abstract class AbstractIntegrationTest {
                     .withPassword("dev");
 
     @Container
-    static final KafkaContainer KAFKA =
+    protected static final KafkaContainer KAFKA =
             new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.4.0"));
 
     static final WireMockServer WIREMOCK = new WireMockServer(options().dynamicPort());

@@ -87,12 +87,11 @@ public class TripServiceGrpcIT extends AbstractIntegrationTest{
 
         @Bean(destroyMethod = "shutdownNow")
         public Server inProcessServer(TestDriverServiceImpl impl) throws Exception {
-            Server server = InProcessServerBuilder.forName(serverName)
+            return InProcessServerBuilder.forName(serverName)
                     .directExecutor()
                     .addService(impl)
                     .build()
                     .start();
-            return server;
         }
 
         @Bean(destroyMethod = "shutdownNow")

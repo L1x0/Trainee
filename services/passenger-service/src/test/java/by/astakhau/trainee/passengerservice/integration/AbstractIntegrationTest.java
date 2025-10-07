@@ -22,10 +22,10 @@ public abstract class AbstractIntegrationTest {
                     .withPassword("dev");
 
     @Container
-    static final KafkaContainer KAFKA =
+    public static final KafkaContainer KAFKA =
             new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.4.0"));
 
-    static final WireMockServer WIREMOCK = new WireMockServer(options().dynamicPort());
+    public static final WireMockServer WIREMOCK = new WireMockServer(options().dynamicPort());
 
     static {
         WIREMOCK.start();
