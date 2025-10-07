@@ -11,38 +11,28 @@ import org.testcontainers.utility.DockerImageName;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 
-@Testcontainers
+@org.testcontainers.junit.jupiter.Testcontainers
 public abstract class AbstractIntegrationTest {
-    @Container
-    static final PostgreSQLContainer<?> POSTGRES =
-            new PostgreSQLContainer<>("postgres:15")
+
+    @org.testcontainers.junit.jupiter.Container
+    @org.springframework.boot.testcontainers.service.connection.ServiceConnection
+    static final org.testcontainers.containers.PostgreSQLContainer<?> POSTGRES =
+            new org.testcontainers.containers.PostgreSQLContainer<>("postgres:15")
                     .withDatabaseName("trips_db")
                     .withUsername("trips_user")
                     .withPassword("dev");
 
-    @Container
-    protected static final KafkaContainer KAFKA =
-            new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.4.0"));
+    @org.testcontainers.junit.jupiter.Container
+    @org.springframework.boot.testcontainers.service.connection.ServiceConnection
+    protected static final org.testcontainers.containers.KafkaContainer KAFKA =
+            new org.testcontainers.containers.KafkaContainer(
+                    org.testcontainers.utility.DockerImageName.parse("confluentinc/cp-kafka:7.4.0"));
 
-    static final WireMockServer WIREMOCK = new WireMockServer(options().dynamicPort());
+    static final com.github.tomakehurst.wiremock.WireMockServer WIREMOCK =
+            new com.github.tomakehurst.wiremock.WireMockServer(
+                    com.github.tomakehurst.wiremock.core.WireMockConfiguration.options().dynamicPort());
 
     static {
         WIREMOCK.start();
-        POSTGRES.start();
-        KAFKA.start();
-    }
-
-    @DynamicPropertySource
-    static void registerProps(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
-        registry.add("spring.datasource.username", POSTGRES::getUsername);
-        registry.add("spring.datasource.password", POSTGRES::getPassword);
-
-        registry.add("spring.kafka.bootstrap-servers", KAFKA::getBootstrapServers);
-
-        registry.add("eureka.client.register-with-eureka", () -> "false");
-        registry.add("eureka.client.fetch-registry", () -> "false");
-
-        registry.add("spring.kafka.producer.transaction-id-prefix", () -> "test-tx-" + java.util.UUID.randomUUID());
     }
 }
