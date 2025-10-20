@@ -189,14 +189,42 @@ services:
     networks:
       - backend
 
-  kafdrop:
-    image: obsidiandynamics/kafdrop
-    depends_on:
-      - kafka
-    ports:
-      - "9000:9000"
+#  kafdrop:
+#    image: obsidiandynamics/kafdrop
+#    depends_on:
+#      - kafka
+#    ports:
+#      - "9000:9000"
+#    environment:
+#      KAFKA_BROKERCONNECT: kafka:9092
+#    networks:
+#      - backend
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.2.1
+    restart: unless-stopped
     environment:
-      KAFKA_BROKERCONNECT: kafka:9092
+      KC_HOSTNAME: keycloak
+      KC_HOSTNAME_STRICT: false
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: dev
+      #KC_HOSTNAME: localhost
+      KC_CACHE: local
+      KC_METRICS_ENABLED: "true"
+      KC_HEALTH_ENABLED: "true"
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    command: [ "start-dev" ]
+    # поменял host-порт на 8085, чтобы не конфликтовал с gateway (который 8080)
+    ports:
+      - "8085:8080"
+      - "8443:8443"
+    depends_on:
+      - postgres
+    volumes:
+      - keycloak_data:/opt/keycloak/data
     networks:
       - backend
 
@@ -238,4 +266,4 @@ networks:
 
 volumes:
   pgdata:
-#  mongodata:
+  keycloak_data:

@@ -12,6 +12,7 @@ public class PassengerMapperImpl implements PassengerMapper {
     public PassengerResponseDto passengerToPassengerResponseDto(Passenger passenger) {
         return PassengerResponseDto.builder()
                 .id(passenger.getId())
+                .uuid(passenger.getUuid())
                 .name(passenger.getName())
                 .phoneNumber(passenger.getPhoneNumber())
                 .email(passenger.getEmail())

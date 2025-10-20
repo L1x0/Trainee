@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-insert-initial-passengers
+      author: artemastahov
+      contexts: dev,test
+
+      # Убедимся, что таблица существует — иначе лучше провалиться/пометить как выполненный.
+      preConditions:
+        - tableExists:
+            tableName: passengers
+
+      changes:
+        - insert:
+            tableName: passengers
+            columns:
+              - column: { name: name, value: "Иван Иванов" }
+              - column: { name: uuid, value: "fdb76d29-9ffd-4943-b4be-7ba75b8b2760"}
+              - column: { name: email, value: "ivan.ivanov@example.com" }
+              - column: { name: phone_number, value: "+375291234567" }
+
+      rollback:
+        # Удалим именно те записи, что мы добавили (по email)
+        - delete:
+            tableName: passengers
+            where: "email IN ('ivan.ivanov@example.com','anna.smirnova@example.com','petr.kovalev@example.com','olga.mironova@example.com','sergey.petrov@example.com')"

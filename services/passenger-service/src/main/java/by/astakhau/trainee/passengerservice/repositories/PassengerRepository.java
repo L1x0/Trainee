@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public interface PassengerRepository extends JpaRepository<Passenger, Long> {
     Optional<Passenger> findByNameAndPhoneNumber(String name, String phoneNumber);
@@ -16,6 +17,9 @@ public interface PassengerRepository extends JpaRepository<Passenger, Long> {
 
     @Query(value = "SELECT * FROM passengers WHERE id = ?", nativeQuery = true)
     Optional<Passenger> findById(Long id);
+
+    @Query(value = "SELECT * FROM passengers WHERE uuid = ?", nativeQuery = true)
+    Optional<Passenger> findByUUID(UUID id);
 
     @Modifying(clearAutomatically = true)
     @Query(value = "UPDATE passengers SET is_deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE name = :name AND email = :email", nativeQuery = true)

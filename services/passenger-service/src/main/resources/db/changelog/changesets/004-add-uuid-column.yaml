@@ -1,0 +1,28 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-add-uuid-to-passengers
+      author: artemastahov
+      changes:
+        - sql:
+            comment: Enable pgcrypto for gen_random_uuid
+            sql: CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+        - addColumn:
+            tableName: passengers
+            columns:
+              - column:
+                  name: uuid
+                  type: uuid
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: passengers
+            columnNames: uuid
+            constraintName: uq_passengers_uuid
+      rollback:
+        - dropUniqueConstraint:
+            constraintName: uq_passengers_uuid
+            tableName: passengers
+        - dropColumn:
+            columnName: uuid
+            tableName: passengers

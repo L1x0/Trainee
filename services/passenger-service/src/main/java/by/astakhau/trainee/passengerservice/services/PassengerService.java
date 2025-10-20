@@ -22,6 +22,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +31,6 @@ public class PassengerService {
 
     final private PassengerRepository passengerRepository;
     final private PassengerMapper passengerMapper;
-    //final private TripClient tripClient;
     final private TripsOrderProducer tripsOrderProducer;
     private final TripInfoService tripInfoService;
 
@@ -48,6 +48,10 @@ public class PassengerService {
 
     public Optional<PassengerResponseDto> findById(Long id) {
         return passengerRepository.findById(id).map(passengerMapper::passengerToPassengerResponseDto);
+    }
+
+    public Optional<PassengerResponseDto> findByUUID(UUID uuid) {
+        return passengerRepository.findByUUID(uuid).map(passengerMapper::passengerToPassengerResponseDto);
     }
 
     public Page<PassengerResponseDto> findAll(Pageable pageable) {

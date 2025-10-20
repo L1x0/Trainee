@@ -7,6 +7,7 @@ import by.astakhau.trainee.passengerservice.dtos.TripResponseDto;
 import by.astakhau.trainee.passengerservice.services.PassengerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.shaded.com.google.protobuf.Empty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +20,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/passenger")
 @RequiredArgsConstructor
@@ -42,9 +45,11 @@ public class PassengerController {
         return ResponseEntity.created(location).build();
     }
 
-    @GetMapping(params = "id")
-    public ResponseEntity<PassengerResponseDto> findById(@RequestParam(required = false) Long id) {
-        return ResponseEntity.of(passengerService.findById(id));
+    @GetMapping()
+    public ResponseEntity<PassengerResponseDto> findById(
+            @RequestHeader(name = "X-User-Id", required = false) String userIdHeader) {
+        log.info("Finding passenger by header ID: {}", userIdHeader);
+        return ResponseEntity.of(passengerService.findByUUID(UUID.fromString(userIdHeader)));
     }
 
     @GetMapping("/all")
